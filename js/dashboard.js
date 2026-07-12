@@ -12,6 +12,12 @@ function showTab(tabName) {
   if (tabName === 'enrollments' && typeof osaRenderEnrollments === 'function') {
     osaRenderEnrollments();
   }
+  if (tabName === 'fees' && typeof osaRenderFees === 'function') {
+    osaRenderFees();
+  }
+  if (tabName === 'analytics' && typeof osaRenderAnalytics === 'function') {
+    osaRenderAnalytics();
+  }
   window.scrollTo(0, 0);
 }
 

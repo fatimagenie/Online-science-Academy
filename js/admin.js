@@ -242,12 +242,19 @@ function osaChangePassword() {
 
 function osaSaveSettings() {
   var d = osaLoad();
-  var nameEl = document.getElementById('settName');
-  var emailEl = document.getElementById('settEmail');
-  var phoneEl = document.getElementById('settPhone');
-  if (nameEl) d.profile.name = nameEl.value;
-  if (emailEl) d.profile.email = emailEl.value;
-  if (phoneEl) d.profile.phone = phoneEl.value;
+  var sn = document.getElementById('settingsName');
+  var st = document.getElementById('settingsTagline');
+  var sw = document.getElementById('settingsWhatsapp');
+  var se = document.getElementById('settingsEmail');
+  var sp = document.getElementById('settingsPhone');
+  var sa = document.getElementById('settingsAddress');
+  if (!d.branding) d.branding = {};
+  if (sn) d.branding.name = sn.value;
+  if (st) d.branding.tagline = st.value;
+  if (sw) d.branding.whatsapp = sw.value;
+  if (se) d.branding.email = se.value;
+  if (sp) d.branding.phone = sp.value;
+  if (sa) d.branding.address = sa.value;
   osaSave(d);
   alert('Settings saved!');
 }
@@ -335,6 +342,95 @@ function osaDeleteEnrollment(id) {
   osaConfirm('Delete this enrollment?', function() {
     var d = osaLoad();
     d.enrollments = (d.enrollments || []).filter(function(e){return e.id !== id;});
+    osaSave(d);
+    osaRefreshAdmin();
+  });
+}
+
+function osaRenderFees() {
+  var d = osaLoad();
+  var fees = d.fees || [];
+  var tbody = document.getElementById('feesBody');
+  var emptyEl = document.getElementById('feesEmpty');
+  if (!tbody) return;
+
+  var totalReceived = 0;
+  var totalPending = 0;
+  var payingStudents = {};
+
+  if (fees.length === 0) {
+    tbody.innerHTML = '';
+    if (emptyEl) emptyEl.style.display = 'block';
+  } else {
+    if (emptyEl) emptyEl.style.display = 'none';
+    var html = '';
+    fees.forEach(function(f) {
+      if (f.status === 'paid') {
+        totalReceived += f.amount || 0;
+        payingStudents[f.studentName] = true;
+      } else {
+        totalPending += f.amount || 0;
+      }
+      var date = new Date(f.date);
+      var dateStr = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+      var statusStyle = f.status === 'paid' ? 'background:#e8f5e9; color:#2e7d32;' : 'background:#ffebee; color:#c62828;';
+      html += '<tr>' +
+        '<td style="font-weight:600;">' + osaEsc(f.studentName) + '</td>' +
+        '<td>' + osaEsc(f.courseName) + '</td>' +
+        '<td>Rs. ' + (f.amount || 0).toLocaleString() + '</td>' +
+        '<td><span class="badge" style="' + statusStyle + '">' + (f.status === 'paid' ? 'Paid' : 'Pending') + '</span></td>' +
+        '<td>' + dateStr + '</td>' +
+        '<td><div class="osa-row-actions"><button class="osa-edit-btn" onclick="osaEditFee(' + f.id + ')">Edit</button><button class="osa-delete-btn" onclick="osaDeleteFee(' + f.id + ')">&#128465;</button></div></td>' +
+      '</tr>';
+    });
+    tbody.innerHTML = html;
+  }
+
+  var receivedEl = document.getElementById('feeTotalReceived');
+  if (receivedEl) receivedEl.textContent = 'Rs. ' + totalReceived.toLocaleString();
+  var pendingEl = document.getElementById('feeTotalPending');
+  if (pendingEl) pendingEl.textContent = 'Rs. ' + totalPending.toLocaleString();
+  var studentsEl = document.getElementById('feeTotalStudents');
+  if (studentsEl) studentsEl.textContent = Object.keys(payingStudents).length;
+}
+
+function osaEditFee(id) {
+  var d = osaLoad();
+  var f = id ? (d.fees || []).find(function(x){return x.id===id;}) : { studentName:'', courseName:'', amount:0, status:'paid', date:new Date().toISOString() };
+  var isNew = !id;
+  var enrollments = d.enrollments || [];
+  var studentOpts = '<option value="">-- Select Student --</option>';
+  enrollments.forEach(function(e) {
+    studentOpts += '<option value="' + osaEsc(e.name) + '" data-course="' + osaEsc(e.courseName) + '"' + (f.studentName === e.name ? ' selected' : '') + '>' + osaEsc(e.name) + ' - ' + osaEsc(e.courseName) + '</option>';
+  });
+  var html = '<div class="osa-form-group"><label>Student</label><select class="osa-input" id="ofStudent">' + studentOpts + '</select></div>' +
+    '<div class="osa-form-row">' +
+    '<div class="osa-form-group"><label>Amount (Rs.)</label><input class="osa-input" id="ofAmount" type="number" value="' + (f.amount || 0) + '"></div>' +
+    '<div class="osa-form-group"><label>Status</label><select class="osa-input" id="ofStatus"><option value="paid"' + (f.status === 'paid' ? ' selected' : '') + '>Paid</option><option value="pending"' + (f.status === 'pending' ? ' selected' : '') + '>Pending</option></select></div></div>' +
+    '<div class="osa-form-group"><label>Date</label><input class="osa-input" id="ofDate" type="date" value="' + (f.date ? new Date(f.date).toISOString().split('T')[0] : '') + '"></div>';
+  osaOpenModal(isNew ? 'Add Payment' : 'Edit Payment', html, function(modal) {
+    var studentSelect = modal.querySelector('#ofStudent');
+    var courseName = studentSelect.options[studentSelect.selectedIndex] ? studentSelect.options[studentSelect.selectedIndex].getAttribute('data-course') || '' : '';
+    var updated = {
+      id: f.id || osaNextId(d.fees || []),
+      studentName: studentSelect.value,
+      courseName: courseName,
+      amount: parseInt(modal.querySelector('#ofAmount').value) || 0,
+      status: modal.querySelector('#ofStatus').value,
+      date: modal.querySelector('#ofDate').value || new Date().toISOString()
+    };
+    if (!d.fees) d.fees = [];
+    if (isNew) { d.fees.push(updated); }
+    else { var idx = d.fees.findIndex(function(x){return x.id===id;}); if (idx >= 0) d.fees[idx] = updated; }
+    osaSave(d);
+    osaRefreshAdmin();
+  });
+}
+
+function osaDeleteFee(id) {
+  osaConfirm('Delete this payment record?', function() {
+    var d = osaLoad();
+    d.fees = (d.fees || []).filter(function(f){return f.id !== id;});
     osaSave(d);
     osaRefreshAdmin();
   });

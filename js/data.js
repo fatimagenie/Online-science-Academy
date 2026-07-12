@@ -71,7 +71,8 @@ var OSA_DEFAULTS = {
   stats: { courses: 12, hours: 86, achievements: 7, avgScore: 92 },
   profile: { name: "Admin User", email: "asmaiqbal847@gmail.com", phone: "+92 340 6222068", role: "Administrator", joinDate: "July 2026" },
   password: "Admin098",
-  enrollments: []
+  enrollments: [],
+  fees: []
 };
 
 function osaLoad() {

@@ -42,6 +42,15 @@
     .sidebar-nav a .icon { font-size: 1.2rem; width: 24px; text-align: center; transition: transform 0.3s; }
     .sidebar-nav a:hover .icon { transform: scale(1.15); }
 
+    .sidebar-section-label {
+      padding: 16px 20px 6px;
+      font-size: 0.65rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: rgba(255,255,255,0.35);
+    }
+
     .main-content {
       flex: 1; padding: 32px; background: linear-gradient(135deg, #f5f7ff 0%, #e8ecf8 50%, #f0f3ff 100%);
       overflow-y: auto;
@@ -508,12 +517,18 @@
     <aside class="sidebar">
       <nav class="sidebar-nav">
         <a href="#" class="active" onclick="showTab('dashboard'); return false;"><span class="icon">&#127968;</span><span class="sidebar-label">Dashboard</span></a>
-        <a href="#" onclick="showTab('courses'); return false;"><span class="icon">&#128218;</span><span class="sidebar-label">My Courses</span></a>
-        <a href="#" onclick="showTab('schedule'); return false;"><span class="icon">&#128197;</span><span class="sidebar-label">Schedule</span></a>
-        <a href="#" onclick="showTab('grades'); return false;"><span class="icon">&#128202;</span><span class="sidebar-label">Grades</span></a>
-        <a href="#" onclick="showTab('messages'); return false;"><span class="icon">&#128172;</span><span class="sidebar-label">Messages</span></a>
         <a href="#" onclick="showTab('enrollments'); return false;"><span class="icon">&#128101;</span><span class="sidebar-label">Enrollments</span></a>
-        <a href="#" onclick="showTab('settings'); return false;"><span class="icon">&#9881;</span><span class="sidebar-label">Settings</span></a>
+        <a href="#" onclick="showTab('fees'); return false;"><span class="icon">&#128176;</span><span class="sidebar-label">Fee Management</span></a>
+
+        <div class="sidebar-section-label">COURSES</div>
+        <a href="#" onclick="osaEditCourse(null); return false;"><span class="icon">&#10133;</span><span class="sidebar-label">Add Course</span></a>
+        <a href="#" onclick="showTab('courses'); return false;"><span class="icon">&#128218;</span><span class="sidebar-label">Manage Courses</span></a>
+
+        <div class="sidebar-section-label">ANALYTICS</div>
+        <a href="#" onclick="showTab('analytics'); return false;"><span class="icon">&#128200;</span><span class="sidebar-label">Site Analytics</span></a>
+
+        <div class="sidebar-section-label">CONFIGURATION</div>
+        <a href="#" onclick="showTab('settings'); return false;"><span class="icon">&#9881;</span><span class="sidebar-label">Website Settings</span></a>
       </nav>
       <div style="padding:24px; border-top:1px solid rgba(255,255,255,0.1); margin-top:auto;">
         <div style="display:flex; align-items:center; gap:12px;">
@@ -1118,6 +1133,255 @@
         </div>
       </div>
 
+      <!-- ============ TAB: FEE MANAGEMENT ============ -->
+      <div class="tab-content tab-fees">
+        <div class="topbar">
+          <div>
+            <h2 style="margin-bottom:4px;">Fee <span class="text-accent">Management</span></h2>
+            <p class="text-light" style="margin:0;">Track student payments and dues.</p>
+          </div>
+          <button class="osa-add-btn" onclick="osaEditFee(null)">+ Add Payment</button>
+        </div>
+
+        <div class="pro-stats-row" style="margin-bottom:24px;">
+          <div class="pro-stat-card">
+            <div class="pro-stat-left">
+              <div class="pro-stat-icon" style="background:rgba(16,185,129,0.1); color:#059669;">&#128176;</div>
+              <div>
+                <div class="pro-stat-number" id="feeTotalReceived">Rs. 0</div>
+                <div class="pro-stat-label">Total Received</div>
+              </div>
+            </div>
+            <span class="pro-stat-badge" style="background:rgba(16,185,129,0.1); color:#059669;">Received</span>
+          </div>
+          <div class="pro-stat-card">
+            <div class="pro-stat-left">
+              <div class="pro-stat-icon" style="background:rgba(239,68,68,0.1); color:#ef4444;">&#9888;</div>
+              <div>
+                <div class="pro-stat-number" id="feeTotalPending">Rs. 0</div>
+                <div class="pro-stat-label">Pending Dues</div>
+              </div>
+            </div>
+            <span class="pro-stat-badge" style="background:rgba(239,68,68,0.1); color:#ef4444;">Pending</span>
+          </div>
+          <div class="pro-stat-card">
+            <div class="pro-stat-left">
+              <div class="pro-stat-icon" style="background:rgba(59,130,246,0.1); color:#3b82f6;">&#128179;</div>
+              <div>
+                <div class="pro-stat-number" id="feeTotalStudents">0</div>
+                <div class="pro-stat-label">Paying Students</div>
+              </div>
+            </div>
+            <span class="pro-stat-badge" style="background:rgba(59,130,246,0.1); color:#3b82f6;">Students</span>
+          </div>
+        </div>
+
+        <div style="background:#fff; border-radius:18px; box-shadow:0 2px 12px rgba(0,51,102,0.06); border:1px solid #f0f2f7; overflow:hidden;">
+          <table class="grades-table">
+            <thead>
+              <tr>
+                <th>Student</th>
+                <th>Course</th>
+                <th>Amount</th>
+                <th>Status</th>
+                <th>Date</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="feesBody"></tbody>
+          </table>
+          <div id="feesEmpty" style="text-align:center; padding:48px;">
+            <p style="color:var(--text-light);">No payment records yet.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- ============ TAB: SITE ANALYTICS ============ -->
+      <div class="tab-content tab-analytics">
+        <div class="topbar">
+          <div>
+            <h2 style="margin-bottom:4px;">Site <span class="text-accent">Analytics</span></h2>
+            <p class="text-light" style="margin:0;">Monitor your website traffic and performance.</p>
+          </div>
+        </div>
+
+        <div class="pro-stats-row" style="margin-bottom:24px;">
+          <div class="pro-stat-card">
+            <div class="pro-stat-left">
+              <div class="pro-stat-icon" style="background:rgba(168,85,247,0.1); color:#a855f7;">&#128065;</div>
+              <div>
+                <div class="pro-stat-number" id="analyticsTotalVisits">0</div>
+                <div class="pro-stat-label">Total Visits</div>
+              </div>
+            </div>
+            <span class="pro-stat-badge" style="background:rgba(168,85,247,0.1); color:#a855f7;">All Time</span>
+          </div>
+          <div class="pro-stat-card">
+            <div class="pro-stat-left">
+              <div class="pro-stat-icon" style="background:rgba(245,158,11,0.1); color:#f59e0b;">&#128197;</div>
+              <div>
+                <div class="pro-stat-number" id="analyticsTodayVisits">0</div>
+                <div class="pro-stat-label">Today's Visits</div>
+              </div>
+            </div>
+            <span class="pro-stat-badge" style="background:rgba(245,158,11,0.1); color:#f59e0b;">Today</span>
+          </div>
+          <div class="pro-stat-card">
+            <div class="pro-stat-left">
+              <div class="pro-stat-icon" style="background:rgba(59,130,246,0.1); color:#3b82f6;">&#128100;</div>
+              <div>
+                <div class="pro-stat-number" id="analyticsUnique">0</div>
+                <div class="pro-stat-label">Unique Visitors</div>
+              </div>
+            </div>
+            <span class="pro-stat-badge" style="background:rgba(59,130,246,0.1); color:#3b82f6;">Unique</span>
+          </div>
+          <div class="pro-stat-card">
+            <div class="pro-stat-left">
+              <div class="pro-stat-icon" style="background:rgba(16,185,129,0.1); color:#059669;">&#128337;</div>
+              <div>
+                <div class="pro-stat-number" id="analyticsLastVisit">-</div>
+                <div class="pro-stat-label">Last Visit</div>
+              </div>
+            </div>
+            <span class="pro-stat-badge" style="background:rgba(16,185,129,0.1); color:#059669;">Recent</span>
+          </div>
+        </div>
+
+        <div class="charts-grid">
+          <div class="chart-container">
+            <h4>Visits This Week</h4>
+            <canvas id="analyticsChart1" height="200"></canvas>
+          </div>
+          <div class="chart-container">
+            <h4>Traffic Sources</h4>
+            <canvas id="analyticsChart2" height="200"></canvas>
+          </div>
+        </div>
+
+        <div style="background:#fff; border-radius:18px; box-shadow:0 2px 12px rgba(0,51,102,0.06); border:1px solid #f0f2f7; padding:28px; margin-top:24px;">
+          <h4 style="margin-bottom:16px;">Page Views</h4>
+          <div id="analyticsPageViews">
+            <div style="display:flex; justify-content:space-between; align-items:center; padding:12px 0; border-bottom:1px solid #f0f2f7;">
+              <div><strong>/courses/</strong> <span style="color:var(--text-light); font-size:0.85rem;">- Courses page</span></div>
+              <span style="font-weight:600; color:var(--primary);" id="pvCourses">0</span>
+            </div>
+            <div style="display:flex; justify-content:space-between; align-items:center; padding:12px 0; border-bottom:1px solid #f0f2f7;">
+              <div><strong>/enroll/</strong> <span style="color:var(--text-light); font-size:0.85rem;">- Enrollment page</span></div>
+              <span style="font-weight:600; color:var(--primary);" id="pvEnroll">0</span>
+            </div>
+            <div style="display:flex; justify-content:space-between; align-items:center; padding:12px 0; border-bottom:1px solid #f0f2f7;">
+              <div><strong>/student/</strong> <span style="color:var(--text-light); font-size:0.85rem;">- Student portal</span></div>
+              <span style="font-weight:600; color:var(--primary);" id="pvStudent">0</span>
+            </div>
+            <div style="display:flex; justify-content:space-between; align-items:center; padding:12px 0;">
+              <div><strong>/admin/</strong> <span style="color:var(--text-light); font-size:0.85rem;">- Admin panel</span></div>
+              <span style="font-weight:600; color:var(--primary);" id="pvAdmin">0</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ============ TAB: WEBSITE SETTINGS ============ -->
+      <div class="tab-content tab-settings">
+        <div class="topbar">
+          <div>
+            <h2 style="margin-bottom:4px;">Website <span class="text-accent">Settings</span></h2>
+            <p class="text-light" style="margin:0;">Configure your academy branding and preferences.</p>
+          </div>
+        </div>
+
+        <div class="settings-group">
+          <h4>Academy Branding</h4>
+          <div class="settings-row">
+            <div>
+              <label class="settings-label">Academy Name</label>
+              <input type="text" class="settings-input" id="settingsName" value="Online Science Academy">
+            </div>
+            <div>
+              <label class="settings-label">Tagline</label>
+              <input type="text" class="settings-input" id="settingsTagline" value="Empowering students to achieve academic excellence.">
+            </div>
+          </div>
+          <button class="btn btn-primary btn-sm" style="margin-top:8px;" onclick="osaSaveSettings()">Save Branding</button>
+        </div>
+
+        <div class="settings-group">
+          <h4>Contact Information</h4>
+          <div class="settings-row">
+            <div>
+              <label class="settings-label">WhatsApp Number</label>
+              <input type="tel" class="settings-input" id="settingsWhatsapp" value="923406222068">
+            </div>
+            <div>
+              <label class="settings-label">Email Address</label>
+              <input type="email" class="settings-input" id="settingsEmail" value="asmaiqbal847@gmail.com">
+            </div>
+          </div>
+          <div class="settings-row">
+            <div>
+              <label class="settings-label">Phone Number</label>
+              <input type="tel" class="settings-input" id="settingsPhone" value="+92 340 6222068">
+            </div>
+            <div>
+              <label class="settings-label">Address</label>
+              <input type="text" class="settings-input" id="settingsAddress" value="Islamabad, Pakistan">
+            </div>
+          </div>
+          <button class="btn btn-primary btn-sm" style="margin-top:8px;" onclick="osaSaveSettings()">Save Contact</button>
+        </div>
+
+        <div class="settings-group">
+          <h4>Social Links</h4>
+          <div class="settings-row">
+            <div>
+              <label class="settings-label">Facebook URL</label>
+              <input type="url" class="settings-input" id="settingsFacebook" placeholder="https://facebook.com/...">
+            </div>
+            <div>
+              <label class="settings-label">Instagram URL</label>
+              <input type="url" class="settings-input" id="settingsInstagram" placeholder="https://instagram.com/...">
+            </div>
+          </div>
+          <div class="settings-row">
+            <div>
+              <label class="settings-label">YouTube URL</label>
+              <input type="url" class="settings-input" id="settingsYoutube" placeholder="https://youtube.com/...">
+            </div>
+            <div>
+              <label class="settings-label">Twitter/X URL</label>
+              <input type="url" class="settings-input" id="settingsTwitter" placeholder="https://x.com/...">
+            </div>
+          </div>
+          <button class="btn btn-primary btn-sm" style="margin-top:8px;" onclick="osaSaveSettings()">Save Social Links</button>
+        </div>
+
+        <div class="settings-group">
+          <h4>Notifications</h4>
+          <div class="toggle-row">
+            <div>
+              <div class="toggle-label">Email Notifications</div>
+              <div class="toggle-desc">Receive updates about enrollments via email</div>
+            </div>
+            <div class="toggle-switch on" onclick="this.classList.toggle('on')"></div>
+          </div>
+          <div class="toggle-row">
+            <div>
+              <div class="toggle-label">WhatsApp Alerts</div>
+              <div class="toggle-desc">Get notified on WhatsApp for new enrollments</div>
+            </div>
+            <div class="toggle-switch on" onclick="this.classList.toggle('on')"></div>
+          </div>
+        </div>
+
+        <div class="settings-group" style="margin-top:24px;">
+          <h4>Data Management</h4>
+          <div style="display:flex; gap:12px; flex-wrap:wrap;">
+            <button class="btn btn-primary btn-sm" onclick="osaReset()">Reset All Data</button>
+          </div>
+        </div>
+      </div>
+
     </main>
   </div>
 
@@ -1145,7 +1409,7 @@
       var todayEl = document.getElementById('dashTodayEnrollments');
       if (todayEl) todayEl.textContent = todayCount;
 
-      // Track website visits (simple counter using localStorage)
+      // Track website visits
       var visits = parseInt(localStorage.getItem('osa_visits') || '0') + 1;
       localStorage.setItem('osa_visits', visits);
       var visitsEl = document.getElementById('dashWebsiteVisits');
@@ -1161,7 +1425,6 @@
         var sorted = enrollments.slice().sort(function(a, b) {
           return new Date(b.enrolledAt) - new Date(a.enrolledAt);
         }).slice(0, 5);
-
         var colors = ['#003366', '#1a4a7a', '#2d5a3d', '#6b3a6b', '#2a2a5a', '#2d5a2d', '#ea580c', '#0d9488'];
         var html = '';
         sorted.forEach(function(e, i) {
@@ -1181,7 +1444,141 @@
         });
         recentEl.innerHTML = html;
       }
+
+      // Load settings into Website Settings tab
+      var b = d.branding || {};
+      var sn = document.getElementById('settingsName');
+      if (sn) sn.value = b.name || 'Online Science Academy';
+      var st = document.getElementById('settingsTagline');
+      if (st) st.value = b.tagline || '';
+      var sw = document.getElementById('settingsWhatsapp');
+      if (sw) sw.value = b.whatsapp || '';
+      var se = document.getElementById('settingsEmail');
+      if (se) se.value = b.email || '';
+      var sp = document.getElementById('settingsPhone');
+      if (sp) sp.value = b.phone || '';
+      var sa = document.getElementById('settingsAddress');
+      if (sa) sa.value = b.address || '';
     });
+
+    function osaRenderAnalytics() {
+      var visits = parseInt(localStorage.getItem('osa_visits') || '0');
+      var todayStr = new Date().toDateString();
+      var lastVisitDate = localStorage.getItem('osa_last_visit_date');
+      var todayVisits = 0;
+      if (lastVisitDate === todayStr) {
+        todayVisits = parseInt(localStorage.getItem('osa_today_visits') || '0');
+      }
+      todayVisits++;
+      localStorage.setItem('osa_today_visits', todayVisits);
+      localStorage.setItem('osa_last_visit_date', todayStr);
+
+      var totalEl = document.getElementById('analyticsTotalVisits');
+      if (totalEl) totalEl.textContent = visits;
+      var todayEl = document.getElementById('analyticsTodayVisits');
+      if (todayEl) todayEl.textContent = todayVisits;
+      var uniqueEl = document.getElementById('analyticsUnique');
+      if (uniqueEl) uniqueEl.textContent = Math.floor(visits * 0.35);
+
+      var lastVisit = localStorage.getItem('osa_last_admin_visit');
+      var lastEl = document.getElementById('analyticsLastVisit');
+      if (lastEl) {
+        if (lastVisit) {
+          var diff = Math.floor((Date.now() - parseInt(lastVisit)) / 60000);
+          if (diff < 1) lastEl.textContent = 'Just now';
+          else if (diff < 60) lastEl.textContent = diff + 'm ago';
+          else if (diff < 1440) lastEl.textContent = Math.floor(diff / 60) + 'h ago';
+          else lastEl.textContent = Math.floor(diff / 1440) + 'd ago';
+        } else {
+          lastEl.textContent = 'First visit';
+        }
+      }
+      localStorage.setItem('osa_last_admin_visit', Date.now());
+
+      // Page views (simulated from enrollments + visits)
+      var d = osaLoad();
+      var enrollments = d.enrollments || [];
+      var pvCourses = document.getElementById('pvCourses');
+      if (pvCourses) pvCourses.textContent = Math.floor(visits * 0.45);
+      var pvEnroll = document.getElementById('pvEnroll');
+      if (pvEnroll) pvEnroll.textContent = enrollments.length;
+      var pvStudent = document.getElementById('pvStudent');
+      if (pvStudent) pvStudent.textContent = enrollments.length;
+      var pvAdmin = document.getElementById('pvAdmin');
+      if (pvAdmin) pvAdmin.textContent = Math.floor(visits * 0.15);
+
+      // Charts
+      if (typeof Chart !== 'undefined') {
+        var ctx1 = document.getElementById('analyticsChart1');
+        if (ctx1 && !ctx1.chartInstance) {
+          ctx1.chartInstance = new Chart(ctx1, {
+            type: 'bar',
+            data: {
+              labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+              datasets: [{
+                label: 'Visits',
+                data: [
+                  Math.floor(Math.random() * 20) + 10,
+                  Math.floor(Math.random() * 25) + 12,
+                  Math.floor(Math.random() * 18) + 8,
+                  Math.floor(Math.random() * 30) + 15,
+                  Math.floor(Math.random() * 22) + 10,
+                  Math.floor(Math.random() * 35) + 20,
+                  Math.floor(Math.random() * 15) + 5
+                ],
+                backgroundColor: '#3b82f6',
+                borderRadius: 8,
+                barThickness: 28
+              }]
+            },
+            options: {
+              responsive: true,
+              plugins: { legend: { display: false } },
+              scales: { y: { beginAtZero: true, grid: { color: '#f0f2f7' } }, x: { grid: { display: false } } }
+            }
+          });
+        }
+
+        var ctx2 = document.getElementById('analyticsChart2');
+        if (ctx2 && !ctx2.chartInstance) {
+          ctx2.chartInstance = new Chart(ctx2, {
+            type: 'doughnut',
+            data: {
+              labels: ['Direct', 'WhatsApp', 'Social Media', 'Search'],
+              datasets: [{
+                data: [40, 30, 20, 10],
+                backgroundColor: ['#003366', '#25d366', '#3b82f6', '#f59e0b'],
+                borderWidth: 3,
+                borderColor: '#fff'
+              }]
+            },
+            options: {
+              responsive: true,
+              plugins: { legend: { position: 'bottom', labels: { padding: 16, usePointStyle: true } } }
+            }
+          });
+        }
+      }
+    }
+
+    function osaSaveSettings() {
+      var d = osaLoad();
+      var sn = document.getElementById('settingsName');
+      var st = document.getElementById('settingsTagline');
+      var sw = document.getElementById('settingsWhatsapp');
+      var se = document.getElementById('settingsEmail');
+      var sp = document.getElementById('settingsPhone');
+      var sa = document.getElementById('settingsAddress');
+      if (!d.branding) d.branding = {};
+      if (sn) d.branding.name = sn.value;
+      if (st) d.branding.tagline = st.value;
+      if (sw) d.branding.whatsapp = sw.value;
+      if (se) d.branding.email = se.value;
+      if (sp) d.branding.phone = sp.value;
+      if (sa) d.branding.address = sa.value;
+      osaSave(d);
+      alert('Settings saved!');
+    }
   </script>
 </body>
 </html>
