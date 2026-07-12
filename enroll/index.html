@@ -233,13 +233,24 @@
       if (typeof firebaseLoadAll === 'function') {
         firebaseLoadAll().then(function(fbData) {
           loadCourses(fbData.courses);
+          autoSelectCourse();
         }).catch(function() {
           var d = osaLoad();
           loadCourses(d.courses);
+          autoSelectCourse();
         });
       } else {
         var d = osaLoad();
         loadCourses(d.courses);
+        autoSelectCourse();
+      }
+
+      function autoSelectCourse() {
+        var params = new URLSearchParams(window.location.search);
+        var courseId = params.get('course');
+        if (courseId) {
+          courseSelect.value = courseId;
+        }
       }
 
       document.getElementById('enrollForm').addEventListener('submit', function(e) {
