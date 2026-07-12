@@ -4,9 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Dashboard - Online Science Academy</title>
-  <link rel="stylesheet" href="css/style.css">
-  <link rel="stylesheet" href="css/components.css">
-  <link rel="stylesheet" href="css/responsive.css">
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../css/components.css">
+  <link rel="stylesheet" href="../css/responsive.css">
   <style>
     .dashboard { display: flex; min-height: calc(100vh - 64px); }
     .sidebar {
@@ -132,11 +132,11 @@
         <button class="hamburger sidebar-toggle" aria-label="Toggle Sidebar" style="display:flex;">
           <span></span><span></span><span></span>
         </button>
-        <a href="index.html" class="navbar-brand">Online <span>Science Academy</span></a>
+        <a href="../" class="navbar-brand">Online <span>Science Academy</span></a>
       </div>
       <div class="nav-links">
-        <a href="index.html">Home</a>
-        <a href="courses.html">Courses</a>
+        <a href="../">Home</a>
+        <a href="../courses/">Courses</a>
         <a href="#">Profile</a>
         <a href="#" class="btn btn-primary btn-sm" onclick="sessionStorage.removeItem('dashboardAuth'); location.reload();">Logout</a>
       </div>
@@ -150,7 +150,7 @@
     <aside class="sidebar">
       <nav class="sidebar-nav">
         <a href="#" class="active"><span class="icon">&#127968;</span><span class="sidebar-label">Dashboard</span></a>
-        <a href="courses.html"><span class="icon">&#128218;</span><span class="sidebar-label">My Courses</span></a>
+        <a href="../courses/"><span class="icon">&#128218;</span><span class="sidebar-label">My Courses</span></a>
         <a href="#"><span class="icon">&#128197;</span><span class="sidebar-label">Schedule</span></a>
         <a href="#"><span class="icon">&#128202;</span><span class="sidebar-label">Grades</span></a>
         <a href="#"><span class="icon">&#128172;</span><span class="sidebar-label">Messages</span></a>
@@ -173,7 +173,7 @@
           <h2 style="margin-bottom:4px;">Welcome back, Ayesha!</h2>
           <p class="text-light" style="margin:0;">Here's your learning progress this week.</p>
         </div>
-        <a href="courses.html" class="btn btn-primary btn-sm">Browse Courses</a>
+        <a href="../courses/" class="btn btn-primary btn-sm">Browse Courses</a>
       </div>
 
       <div class="stats-grid">
@@ -339,7 +339,7 @@
                 </div>
                 <p class="text-light" style="font-size:0.9rem; margin:0;">15/20 hours completed</p>
               </div>
-              <a href="courses.html" class="btn btn-primary" style="width:100%; margin-top:8px;">Continue Learning</a>
+              <a href="../courses/" class="btn btn-primary" style="width:100%; margin-top:8px;">Continue Learning</a>
             </div>
           </div>
         </div>
@@ -347,7 +347,7 @@
     </main>
   </div>
 
-  <script src="js/main.js"></script>
-  <script src="js/dashboard.js"></script>
+  <script src="../js/main.js"></script>
+  <script src="../js/dashboard.js"></script>
 </body>
 </html>
