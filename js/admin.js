@@ -260,3 +260,82 @@ function osaEsc(str) {
 function osaRefreshAdmin() {
   location.reload();
 }
+
+function osaRenderEnrollments() {
+  var d = osaLoad();
+  var enrollments = d.enrollments || [];
+  var tbody = document.getElementById('enrollmentsBody');
+  var emptyEl = document.getElementById('enrollmentsEmpty');
+  if (!tbody) return;
+
+  if (enrollments.length === 0) {
+    tbody.innerHTML = '';
+    if (emptyEl) emptyEl.style.display = 'block';
+    return;
+  }
+
+  if (emptyEl) emptyEl.style.display = 'none';
+  var html = '';
+  enrollments.forEach(function(e) {
+    var date = new Date(e.enrolledAt);
+    var dateStr = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    var statusStyle = e.status === 'active' ? 'background:#e8f5e9; color:#2e7d32;' : 'background:#f3e5f5; color:#7b1fa2;';
+    html += '<tr>' +
+      '<td style="font-weight:600;">' + osaEsc(e.name) + '</td>' +
+      '<td>' + osaEsc(e.email) + '</td>' +
+      '<td>' + osaEsc(e.phone) + '</td>' +
+      '<td>' + osaEsc(e.courseName || 'N/A') + '</td>' +
+      '<td>' + dateStr + '</td>' +
+      '<td><span class="badge" style="' + statusStyle + '">' + osaEsc(e.status) + '</span></td>' +
+      '<td><div class="osa-row-actions"><button class="osa-edit-btn" onclick="osaEditEnrollment(' + e.id + ')">Edit</button><button class="osa-delete-btn" onclick="osaDeleteEnrollment(' + e.id + ')">&#128465;</button></div></td>' +
+    '</tr>';
+  });
+  tbody.innerHTML = html;
+}
+
+function osaEditEnrollment(id) {
+  var d = osaLoad();
+  var e = id ? (d.enrollments || []).find(function(x){return x.id===id;}) : { name:'', email:'', phone:'', courseId:'', courseName:'', message:'', status:'active' };
+  var isNew = !id;
+  var courseOpts = '<option value="">-- Select Course --</option>';
+  d.courses.forEach(function(c) {
+    courseOpts += '<option value="' + c.id + '" data-name="' + osaEsc(c.name) + '"' + (e.courseId === c.id ? ' selected' : '') + '>' + osaEsc(c.name) + '</option>';
+  });
+  var html = '<div class="osa-form-row">' +
+    '<div class="osa-form-group"><label>Student Name</label><input class="osa-input" id="oeName" value="' + osaEsc(e.name) + '"></div>' +
+    '<div class="osa-form-group"><label>Email</label><input class="osa-input" id="oeEmail" type="email" value="' + osaEsc(e.email) + '"></div></div>' +
+    '<div class="osa-form-row">' +
+    '<div class="osa-form-group"><label>Phone</label><input class="osa-input" id="oePhone" value="' + osaEsc(e.phone) + '"></div>' +
+    '<div class="osa-form-group"><label>Course</label><select class="osa-input" id="oeCourse">' + courseOpts + '</select></div></div>' +
+    '<div class="osa-form-group"><label>Message</label><textarea class="osa-input osa-textarea" id="oeMessage">' + osaEsc(e.message) + '</textarea></div>' +
+    '<div class="osa-form-group"><label>Status</label><select class="osa-input" id="oeStatus"><option value="active"' + (e.status === 'active' ? ' selected' : '') + '>Active</option><option value="inactive"' + (e.status === 'inactive' ? ' selected' : '') + '>Inactive</option></select></div>';
+  osaOpenModal(isNew ? 'Add Enrollment' : 'Edit Enrollment', html, function(modal) {
+    var courseSelect = modal.querySelector('#oeCourse');
+    var selectedOpt = courseSelect.options[courseSelect.selectedIndex];
+    var updated = {
+      id: e.id || osaNextId(d.enrollments || []),
+      name: modal.querySelector('#oeName').value,
+      email: modal.querySelector('#oeEmail').value,
+      phone: modal.querySelector('#oePhone').value,
+      courseId: parseInt(courseSelect.value) || 0,
+      courseName: selectedOpt ? selectedOpt.getAttribute('data-name') || '' : '',
+      message: modal.querySelector('#oeMessage').value,
+      status: modal.querySelector('#oeStatus').value,
+      enrolledAt: e.enrolledAt || new Date().toISOString()
+    };
+    if (!d.enrollments) d.enrollments = [];
+    if (isNew) { d.enrollments.push(updated); }
+    else { var idx = d.enrollments.findIndex(function(x){return x.id===id;}); if (idx >= 0) d.enrollments[idx] = updated; }
+    osaSave(d);
+    osaRefreshAdmin();
+  });
+}
+
+function osaDeleteEnrollment(id) {
+  osaConfirm('Delete this enrollment?', function() {
+    var d = osaLoad();
+    d.enrollments = (d.enrollments || []).filter(function(e){return e.id !== id;});
+    osaSave(d);
+    osaRefreshAdmin();
+  });
+}

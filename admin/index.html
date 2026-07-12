@@ -377,6 +377,7 @@
         <a href="#" onclick="showTab('schedule'); return false;"><span class="icon">&#128197;</span><span class="sidebar-label">Schedule</span></a>
         <a href="#" onclick="showTab('grades'); return false;"><span class="icon">&#128202;</span><span class="sidebar-label">Grades</span></a>
         <a href="#" onclick="showTab('messages'); return false;"><span class="icon">&#128172;</span><span class="sidebar-label">Messages</span></a>
+        <a href="#" onclick="showTab('enrollments'); return false;"><span class="icon">&#128101;</span><span class="sidebar-label">Enrollments</span></a>
         <a href="#" onclick="showTab('settings'); return false;"><span class="icon">&#9881;</span><span class="sidebar-label">Settings</span></a>
       </nav>
       <div style="padding:24px; border-top:1px solid rgba(255,255,255,0.1); margin-top:auto;">
@@ -960,21 +961,6 @@
         </div>
 
         <div class="settings-group">
-          <h4>Change Password</h4>
-          <div class="settings-row">
-            <div>
-              <label class="settings-label">Current Password</label>
-              <input type="password" class="settings-input" id="settingsCurrentPw" placeholder="Enter current password">
-            </div>
-            <div>
-              <label class="settings-label">New Password</label>
-              <input type="password" class="settings-input" id="settingsNewPw" placeholder="Enter new password">
-            </div>
-          </div>
-          <button class="btn btn-primary btn-sm" style="margin-top:8px;" onclick="osaChangePassword()">Update Password</button>
-        </div>
-
-        <div class="settings-group">
           <h4>Notifications</h4>
           <div class="toggle-row">
             <div>
@@ -1044,6 +1030,37 @@
               <div class="profile-info-label">Member Since</div>
               <div class="profile-info-value">July 2026</div>
             </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ============ TAB: ENROLLMENTS ============ -->
+      <div class="tab-content tab-enrollments">
+        <div class="topbar">
+          <div>
+            <h2 style="margin-bottom:4px;">Student <span class="text-accent">Enrollments</span></h2>
+            <p class="text-light" style="margin:0;">Manage enrolled students.</p>
+          </div>
+          <button class="osa-add-btn" onclick="osaEditEnrollment(null)">+ Add Enrollment</button>
+        </div>
+        <div id="enrollmentsTableContainer">
+          <table class="grades-table">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Phone</th>
+                <th>Course</th>
+                <th>Enrolled</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="enrollmentsBody"></tbody>
+          </table>
+          <div id="enrollmentsEmpty" style="text-align:center; padding:48px; display:none;">
+            <p style="color:var(--text-light); font-size:1rem;">No enrollments yet.</p>
+            <p style="color:var(--text-light); font-size:0.85rem; margin-top:8px;">Students will appear here after they enroll.</p>
           </div>
         </div>
       </div>

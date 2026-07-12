@@ -9,6 +9,9 @@ function showTab(tabName) {
       link.classList.add('active');
     }
   });
+  if (tabName === 'enrollments' && typeof osaRenderEnrollments === 'function') {
+    osaRenderEnrollments();
+  }
   window.scrollTo(0, 0);
 }
 

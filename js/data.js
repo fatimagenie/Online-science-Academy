@@ -70,7 +70,8 @@ var OSA_DEFAULTS = {
   ],
   stats: { courses: 12, hours: 86, achievements: 7, avgScore: 92 },
   profile: { name: "Admin User", email: "asmaiqbal847@gmail.com", phone: "+92 340 6222068", role: "Administrator", joinDate: "July 2026" },
-  password: "Admin098"
+  password: "Admin098",
+  enrollments: []
 };
 
 function osaLoad() {
@@ -95,4 +96,38 @@ function osaNextId(arr) {
   var max = 0;
   arr.forEach(function(item) { if (item.id > max) max = item.id; });
   return max + 1;
+}
+
+function osaAddEnrollment(data) {
+  var d = osaLoad();
+  if (!d.enrollments) d.enrollments = [];
+  data.id = osaNextId(d.enrollments);
+  data.enrolledAt = new Date().toISOString();
+  data.status = 'active';
+  d.enrollments.push(data);
+  osaSave(d);
+  return data;
+}
+
+function osaGetEnrollments() {
+  var d = osaLoad();
+  return d.enrollments || [];
+}
+
+function osaStudentLogin(email) {
+  var enrollments = osaGetEnrollments();
+  for (var i = 0; i < enrollments.length; i++) {
+    if (enrollments[i].email.toLowerCase() === email.toLowerCase()) {
+      return enrollments[i];
+    }
+  }
+  return null;
+}
+
+function osaGetCourseById(id) {
+  var d = osaLoad();
+  for (var i = 0; i < d.courses.length; i++) {
+    if (d.courses[i].id === id) return d.courses[i];
+  }
+  return null;
 }
