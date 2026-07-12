@@ -1,0 +1,262 @@
+function osaOpenModal(title, bodyHtml, onSave) {
+  var existing = document.getElementById('osaModal');
+  if (existing) existing.remove();
+  var modal = document.createElement('div');
+  modal.id = 'osaModal';
+  modal.className = 'osa-modal-overlay';
+  modal.innerHTML = '<div class="osa-modal-card">' +
+    '<div class="osa-modal-header"><h3>' + title + '</h3><button class="osa-modal-close" onclick="osaCloseModal()">&times;</button></div>' +
+    '<div class="osa-modal-body">' + bodyHtml + '</div>' +
+    '<div class="osa-modal-footer"><button class="btn btn-secondary btn-sm" onclick="osaCloseModal()">Cancel</button><button class="btn btn-primary btn-sm osa-modal-save">Save</button></div>' +
+    '</div>';
+  document.body.appendChild(modal);
+  modal.querySelector('.osa-modal-save').addEventListener('click', function() {
+    if (onSave) onSave(modal);
+    osaCloseModal();
+  });
+  modal.addEventListener('click', function(e) { if (e.target === modal) osaCloseModal(); });
+}
+
+function osaCloseModal() {
+  var m = document.getElementById('osaModal');
+  if (m) m.remove();
+}
+
+function osaConfirm(msg, cb) {
+  osaOpenModal('Confirm', '<p style="text-align:center;font-size:1rem;">' + msg + '</p>', function() { cb(); });
+}
+
+function osaEditBranding() {
+  var d = osaLoad();
+  var b = d.branding;
+  var html = '<div class="osa-form-group"><label>Website Name</label><input class="osa-input" id="osName" value="' + osaEsc(b.name) + '"></div>' +
+    '<div class="osa-form-group"><label>Tagline</label><input class="osa-input" id="osTagline" value="' + osaEsc(b.tagline) + '"></div>' +
+    '<div class="osa-form-group"><label>WhatsApp Number (with country code)</label><input class="osa-input" id="osWhatsapp" value="' + osaEsc(b.whatsapp) + '"></div>' +
+    '<div class="osa-form-group"><label>Email</label><input class="osa-input" id="osEmail" value="' + osaEsc(b.email) + '"></div>' +
+    '<div class="osa-form-group"><label>Phone</label><input class="osa-input" id="osPhone" value="' + osaEsc(b.phone) + '"></div>' +
+    '<div class="osa-form-group"><label>Address</label><input class="osa-input" id="osAddress" value="' + osaEsc(b.address) + '"></div>';
+  osaOpenModal('Edit Branding', html, function(modal) {
+    d.branding.name = modal.querySelector('#osName').value;
+    d.branding.tagline = modal.querySelector('#osTagline').value;
+    d.branding.whatsapp = modal.querySelector('#osWhatsapp').value;
+    d.branding.email = modal.querySelector('#osEmail').value;
+    d.branding.phone = modal.querySelector('#osPhone').value;
+    d.branding.address = modal.querySelector('#osAddress').value;
+    osaSave(d);
+    osaRefreshAdmin();
+  });
+}
+
+function osaEditCourse(id) {
+  var d = osaLoad();
+  var c = id ? d.courses.find(function(x){return x.id===id;}) : { name:'', category:'math', teacher:'', initials:'', description:'', grade:'Grade 9-10', lessons:0, rating:0, stars:0, price:'Rs. 0', emoji:'\u{1F4DA}', colors:['#003366','#3a5f94'] };
+  var isNew = !id;
+  var cats = ['math','physics','chemistry','biology','english','cs'];
+  var catOpts = cats.map(function(c){ return '<option value="'+c+'"'+(c===c.category?' selected':'')+'>'+c+'</option>'; }).join('');
+  var html = '<div class="osa-form-row">' +
+    '<div class="osa-form-group"><label>Course Name</label><input class="osa-input" id="ocName" value="' + osaEsc(c.name) + '"></div>' +
+    '<div class="osa-form-group"><label>Category</label><select class="osa-input" id="ocCat">' + cats.map(function(cat){ return '<option value="'+cat+'"'+(cat===c.category?' selected':'')+'>'+cat+'</option>'; }).join('') + '</select></div></div>' +
+    '<div class="osa-form-row">' +
+    '<div class="osa-form-group"><label>Teacher Name</label><input class="osa-input" id="ocTeacher" value="' + osaEsc(c.teacher) + '"></div>' +
+    '<div class="osa-form-group"><label>Initials (2 letters)</label><input class="osa-input" id="ocInitials" value="' + osaEsc(c.initials) + '" maxlength="2"></div></div>' +
+    '<div class="osa-form-group"><label>Description</label><input class="osa-input" id="ocDesc" value="' + osaEsc(c.description) + '"></div>' +
+    '<div class="osa-form-row">' +
+    '<div class="osa-form-group"><label>Grade</label><input class="osa-input" id="ocGrade" value="' + osaEsc(c.grade) + '"></div>' +
+    '<div class="osa-form-group"><label>Lessons</label><input class="osa-input" id="ocLessons" type="number" value="' + c.lessons + '"></div></div>' +
+    '<div class="osa-form-row">' +
+    '<div class="osa-form-group"><label>Rating (0-5)</label><input class="osa-input" id="ocRating" type="number" step="0.1" min="0" max="5" value="' + c.rating + '"></div>' +
+    '<div class="osa-form-group"><label>Stars (1-5)</label><input class="osa-input" id="ocStars" type="number" min="1" max="5" value="' + c.stars + '"></div></div>' +
+    '<div class="osa-form-group"><label>Price</label><input class="osa-input" id="ocPrice" value="' + osaEsc(c.price) + '"></div>';
+  osaOpenModal(isNew ? 'Add Course' : 'Edit Course', html, function(modal) {
+    var updated = {
+      id: c.id || osaNextId(d.courses),
+      name: modal.querySelector('#ocName').value,
+      category: modal.querySelector('#ocCat').value,
+      teacher: modal.querySelector('#ocTeacher').value,
+      initials: modal.querySelector('#ocInitials').value.toUpperCase(),
+      description: modal.querySelector('#ocDesc').value,
+      grade: modal.querySelector('#ocGrade').value,
+      lessons: parseInt(modal.querySelector('#ocLessons').value) || 0,
+      rating: parseFloat(modal.querySelector('#ocRating').value) || 0,
+      stars: parseInt(modal.querySelector('#ocStars').value) || 4,
+      price: modal.querySelector('#ocPrice').value,
+      emoji: c.emoji || '\u{1F4DA}',
+      colors: c.colors || ['#003366','#3a5f94']
+    };
+    if (isNew) { d.courses.push(updated); }
+    else { var idx = d.courses.findIndex(function(x){return x.id===id;}); if(idx>=0) d.courses[idx] = updated; }
+    osaSave(d);
+    osaRefreshAdmin();
+  });
+}
+
+function osaDeleteCourse(id) {
+  osaConfirm('Delete this course?', function() {
+    var d = osaLoad();
+    d.courses = d.courses.filter(function(c){return c.id!==id;});
+    osaSave(d);
+    osaRefreshAdmin();
+  });
+}
+
+function osaEditGrade(id) {
+  var d = osaLoad();
+  var g = id ? d.grades.find(function(x){return x.id===id;}) : { subject:'', teacher:'', marks:0, total:100, grade:'A', status:'Passed' };
+  var isNew = !id;
+  var html = '<div class="osa-form-row">' +
+    '<div class="osa-form-group"><label>Subject</label><input class="osa-input" id="ogSubject" value="' + osaEsc(g.subject) + '"></div>' +
+    '<div class="osa-form-group"><label>Teacher</label><input class="osa-input" id="ogTeacher" value="' + osaEsc(g.teacher) + '"></div></div>' +
+    '<div class="osa-form-row">' +
+    '<div class="osa-form-group"><label>Marks</label><input class="osa-input" id="ogMarks" type="number" value="' + g.marks + '"></div>' +
+    '<div class="osa-form-group"><label>Total</label><input class="osa-input" id="ogTotal" type="number" value="' + g.total + '"></div></div>' +
+    '<div class="osa-form-row">' +
+    '<div class="osa-form-group"><label>Grade</label><input class="osa-input" id="ogGrade" value="' + osaEsc(g.grade) + '"></div>' +
+    '<div class="osa-form-group"><label>Status</label><select class="osa-input" id="ogStatus"><option'+(g.status==='Passed'?' selected':'')+'>Passed</option><option'+(g.status==='Needs Work'?' selected':'')+'>Needs Work</option><option'+(g.status==='Failed'?' selected':'')+'>Failed</option></select></div></div>';
+  osaOpenModal(isNew ? 'Add Grade' : 'Edit Grade', html, function(modal) {
+    var updated = {
+      id: g.id || osaNextId(d.grades),
+      subject: modal.querySelector('#ogSubject').value,
+      teacher: modal.querySelector('#ogTeacher').value,
+      marks: parseInt(modal.querySelector('#ogMarks').value) || 0,
+      total: parseInt(modal.querySelector('#ogTotal').value) || 100,
+      grade: modal.querySelector('#ogGrade').value,
+      status: modal.querySelector('#ogStatus').value
+    };
+    if (isNew) { d.grades.push(updated); }
+    else { var idx = d.grades.findIndex(function(x){return x.id===id;}); if(idx>=0) d.grades[idx] = updated; }
+    osaSave(d);
+    osaRefreshAdmin();
+  });
+}
+
+function osaDeleteGrade(id) {
+  osaConfirm('Delete this grade?', function() {
+    var d = osaLoad();
+    d.grades = d.grades.filter(function(g){return g.id!==id;});
+    osaSave(d);
+    osaRefreshAdmin();
+  });
+}
+
+function osaEditMessage(id) {
+  var d = osaLoad();
+  var m = id ? d.messages.find(function(x){return x.id===id;}) : { sender:'', initials:'', color:'#003366', text:'', time:'Just now', unread:true };
+  var isNew = !id;
+  var html = '<div class="osa-form-row">' +
+    '<div class="osa-form-group"><label>Sender Name</label><input class="osa-input" id="omSender" value="' + osaEsc(m.sender) + '"></div>' +
+    '<div class="osa-form-group"><label>Initials</label><input class="osa-input" id="omInitials" value="' + osaEsc(m.initials) + '" maxlength="2"></div></div>' +
+    '<div class="osa-form-group"><label>Message</label><textarea class="osa-input osa-textarea" id="omText">' + osaEsc(m.text) + '</textarea></div>';
+  osaOpenModal(isNew ? 'Add Message' : 'Edit Message', html, function(modal) {
+    var updated = {
+      id: m.id || osaNextId(d.messages),
+      sender: modal.querySelector('#omSender').value,
+      initials: modal.querySelector('#omInitials').value.toUpperCase(),
+      color: m.color || '#003366',
+      text: modal.querySelector('#omText').value,
+      time: isNew ? 'Just now' : m.time,
+      unread: true
+    };
+    if (isNew) { d.messages.push(updated); }
+    else { var idx = d.messages.findIndex(function(x){return x.id===id;}); if(idx>=0) d.messages[idx] = updated; }
+    osaSave(d);
+    osaRefreshAdmin();
+  });
+}
+
+function osaDeleteMessage(id) {
+  osaConfirm('Delete this message?', function() {
+    var d = osaLoad();
+    d.messages = d.messages.filter(function(m){return m.id!==id;});
+    osaSave(d);
+    osaRefreshAdmin();
+  });
+}
+
+function osaEditSchedule() {
+  var d = osaLoad();
+  var s = d.schedule;
+  var html = '<p style="margin-bottom:12px;color:var(--text-light);font-size:0.9rem;">Edit time slots (comma separated):</p>' +
+    '<div class="osa-form-group"><label>Time Slots</label><input class="osa-input" id="osTimeSlots" value="' + osaEsc(s.timeSlots.join(', ')) + '"></div>' +
+    '<p style="margin:16px 0 8px;color:var(--text-light);font-size:0.9rem;">For each cell, use format: Subject - Teacher</p>';
+  s.days.forEach(function(day, di) {
+    html += '<div style="margin-bottom:12px;"><strong>' + day + '</strong></div>';
+    s.timeSlots.forEach(function(slot, ti) {
+      var cell = s.grid[ti] ? s.grid[ti][di] : { subject:'', teacher:'' };
+      html += '<div class="osa-form-row" style="margin-bottom:4px;">' +
+        '<div class="osa-form-group" style="flex:1;"><input class="osa-input osa-input-sm" data-day="' + di + '" data-slot="' + ti + '-sub" value="' + osaEsc(cell.subject) + '" placeholder="Subject"></div>' +
+        '<div class="osa-form-group" style="flex:1;"><input class="osa-input osa-input-sm" data-day="' + di + '" data-slot="' + ti + '-teach" value="' + osaEsc(cell.teacher) + '" placeholder="Teacher"></div>' +
+        '</div>';
+    });
+  });
+  osaOpenModal('Edit Schedule', html, function(modal) {
+    var tsRaw = modal.querySelector('#osTimeSlots').value.split(',').map(function(t){return t.trim();}).filter(Boolean);
+    s.timeSlots = tsRaw;
+    s.days.forEach(function(day, di) {
+      tsRaw.forEach(function(slot, ti) {
+        if (!s.grid[ti]) s.grid[ti] = [];
+        if (!s.grid[ti][di]) s.grid[ti][di] = { subject:'', teacher:'' };
+        var subEl = modal.querySelector('[data-day="'+di+'"][data-slot="'+ti+'-sub"]');
+        var teaEl = modal.querySelector('[data-day="'+di+'"][data-slot="'+ti+'-teach"]');
+        if (subEl) s.grid[ti][di].subject = subEl.value;
+        if (teaEl) s.grid[ti][di].teacher = teaEl.value;
+      });
+    });
+    while (s.grid.length > tsRaw.length) s.grid.pop();
+    osaSave(d);
+    osaRefreshAdmin();
+  });
+}
+
+function osaEditProfile() {
+  var d = osaLoad();
+  var p = d.profile;
+  var html = '<div class="osa-form-group"><label>Full Name</label><input class="osa-input" id="opName" value="' + osaEsc(p.name) + '"></div>' +
+    '<div class="osa-form-group"><label>Email</label><input class="osa-input" id="opEmail" value="' + osaEsc(p.email) + '"></div>' +
+    '<div class="osa-form-group"><label>Phone</label><input class="osa-input" id="opPhone" value="' + osaEsc(p.phone) + '"></div>';
+  osaOpenModal('Edit Profile', html, function(modal) {
+    d.profile.name = modal.querySelector('#opName').value;
+    d.profile.email = modal.querySelector('#opEmail').value;
+    d.profile.phone = modal.querySelector('#opPhone').value;
+    osaSave(d);
+    osaRefreshAdmin();
+  });
+}
+
+function osaChangePassword() {
+  var d = osaLoad();
+  var html = '<div class="osa-form-group"><label>Current Password</label><input class="osa-input" id="opOldPass" type="password"></div>' +
+    '<div class="osa-form-group"><label>New Password</label><input class="osa-input" id="opNewPass" type="password"></div>' +
+    '<div class="osa-form-group"><label>Confirm New Password</label><input class="osa-input" id="opConfPass" type="password"></div>';
+  osaOpenModal('Change Password', html, function(modal) {
+    var oldP = modal.querySelector('#opOldPass').value;
+    var newP = modal.querySelector('#opNewPass').value;
+    var confP = modal.querySelector('#opConfPass').value;
+    if (oldP !== d.password) { alert('Current password is wrong!'); return; }
+    if (!newP || newP.length < 4) { alert('Password must be at least 4 characters!'); return; }
+    if (newP !== confP) { alert('Passwords do not match!'); return; }
+    d.password = newP;
+    osaSave(d);
+    alert('Password updated successfully!');
+  });
+}
+
+function osaSaveSettings() {
+  var d = osaLoad();
+  var nameEl = document.getElementById('settName');
+  var emailEl = document.getElementById('settEmail');
+  var phoneEl = document.getElementById('settPhone');
+  if (nameEl) d.profile.name = nameEl.value;
+  if (emailEl) d.profile.email = emailEl.value;
+  if (phoneEl) d.profile.phone = phoneEl.value;
+  osaSave(d);
+  alert('Settings saved!');
+}
+
+function osaEsc(str) {
+  if (!str) return '';
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function osaRefreshAdmin() {
+  location.reload();
+}

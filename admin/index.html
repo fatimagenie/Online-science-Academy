@@ -260,6 +260,61 @@
       .settings-row { grid-template-columns: 1fr; }
       .profile-info { grid-template-columns: 1fr; }
     }
+
+    .osa-modal-overlay {
+      position: fixed; inset: 0; background: rgba(0,20,40,0.6); z-index: 10000;
+      display: flex; align-items: center; justify-content: center;
+      backdrop-filter: blur(4px); animation: fadeInUp 0.3s ease;
+    }
+    .osa-modal-card {
+      background: #fff; border-radius: 20px; width: 90%; max-width: 560px;
+      max-height: 85vh; overflow-y: auto; box-shadow: 0 25px 60px rgba(0,0,0,0.3);
+      animation: fadeInUp 0.4s ease;
+    }
+    .osa-modal-header {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 20px 28px; border-bottom: 1px solid #e0e4ed;
+    }
+    .osa-modal-header h3 { margin: 0; font-family: var(--heading-font); font-size: 1.2rem; color: var(--primary-dark); }
+    .osa-modal-close {
+      width: 32px; height: 32px; border: none; background: #f0f3ff; border-radius: 8px;
+      font-size: 1.3rem; cursor: pointer; color: #666; transition: all 0.2s; display: flex; align-items: center; justify-content: center;
+    }
+    .osa-modal-close:hover { background: #ffdad6; color: #93000a; }
+    .osa-modal-body { padding: 24px 28px; }
+    .osa-modal-footer { padding: 16px 28px; border-top: 1px solid #e0e4ed; display: flex; justify-content: flex-end; gap: 10px; }
+    .osa-form-group { margin-bottom: 16px; }
+    .osa-form-group label { display: block; font-size: 0.85rem; font-weight: 600; color: var(--primary-dark); margin-bottom: 6px; }
+    .osa-input {
+      width: 100%; padding: 12px 14px; border: 2px solid #e0e4ed; border-radius: 10px;
+      font-size: 0.95rem; font-family: var(--body-font); outline: none; box-sizing: border-box; transition: all 0.3s; background: #fafbff;
+    }
+    .osa-input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(0,51,102,0.08); background: #fff; }
+    .osa-input-sm { padding: 8px 10px; font-size: 0.85rem; }
+    .osa-textarea { min-height: 100px; resize: vertical; }
+    .osa-form-row { display: flex; gap: 16px; }
+    .osa-form-row .osa-form-group { flex: 1; }
+    .osa-edit-btn {
+      display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; border-radius: 8px;
+      font-size: 0.8rem; font-weight: 600; cursor: pointer; border: none; transition: all 0.2s;
+      background: rgba(0,51,102,0.08); color: var(--primary-dark);
+    }
+    .osa-edit-btn:hover { background: rgba(0,51,102,0.15); }
+    .osa-add-btn {
+      display: inline-flex; align-items: center; gap: 6px; padding: 10px 20px; border-radius: 10px;
+      font-size: 0.9rem; font-weight: 700; cursor: pointer; border: none; transition: all 0.3s;
+      background: linear-gradient(135deg, #FFD700, #FFC000); color: var(--primary-dark);
+      box-shadow: 0 4px 12px rgba(255,215,0,0.3);
+    }
+    .osa-add-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(255,215,0,0.4); }
+    .osa-delete-btn {
+      display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px;
+      border-radius: 8px; border: none; cursor: pointer; transition: all 0.2s;
+      background: rgba(244,67,54,0.08); color: #c62828; font-size: 0.85rem;
+    }
+    .osa-delete-btn:hover { background: rgba(244,67,54,0.15); }
+    .osa-row-actions { display: flex; gap: 6px; align-items: center; }
+    @media (max-width: 768px) { .osa-form-row { flex-direction: column; gap: 0; } }
   </style>
 </head>
 <body>
@@ -537,6 +592,7 @@
             <h2 style="margin-bottom:4px;">My <span class="text-accent">Courses</span></h2>
             <p class="text-light" style="margin:0;">Continue learning where you left off.</p>
           </div>
+          <button class="osa-add-btn" onclick="osaEditCourse(null)">+ Add Course</button>
         </div>
 
         <div class="course-enrolled-card">
@@ -551,7 +607,10 @@
               <span>Rs. 4,500</span>
             </div>
           </div>
-          <a href="https://wa.me/923406222068?text=Hi! I want to continue Mathematics course" target="_blank" class="btn btn-primary btn-sm">Continue</a>
+          <div class="osa-row-actions">
+            <button class="osa-edit-btn" onclick="osaEditCourse(1)">Edit</button>
+            <button class="osa-delete-btn" onclick="osaDeleteCourse(1)">&#128465;</button>
+          </div>
         </div>
 
         <div class="course-enrolled-card">
@@ -566,7 +625,10 @@
               <span>Rs. 5,200</span>
             </div>
           </div>
-          <a href="https://wa.me/923406222068?text=Hi! I want to continue Physics course" target="_blank" class="btn btn-primary btn-sm">Continue</a>
+          <div class="osa-row-actions">
+            <button class="osa-edit-btn" onclick="osaEditCourse(2)">Edit</button>
+            <button class="osa-delete-btn" onclick="osaDeleteCourse(2)">&#128465;</button>
+          </div>
         </div>
 
         <div class="course-enrolled-card">
@@ -581,7 +643,10 @@
               <span>Rs. 4,800</span>
             </div>
           </div>
-          <a href="https://wa.me/923406222068?text=Hi! I want to continue Chemistry course" target="_blank" class="btn btn-primary btn-sm">Continue</a>
+          <div class="osa-row-actions">
+            <button class="osa-edit-btn" onclick="osaEditCourse(3)">Edit</button>
+            <button class="osa-delete-btn" onclick="osaDeleteCourse(3)">&#128465;</button>
+          </div>
         </div>
 
         <div class="course-enrolled-card">
@@ -596,7 +661,10 @@
               <span>Rs. 3,800</span>
             </div>
           </div>
-          <a href="https://wa.me/923406222068?text=Hi! I want to continue English course" target="_blank" class="btn btn-primary btn-sm">Continue</a>
+          <div class="osa-row-actions">
+            <button class="osa-edit-btn" onclick="osaEditCourse(4)">Edit</button>
+            <button class="osa-delete-btn" onclick="osaDeleteCourse(4)">&#128465;</button>
+          </div>
         </div>
 
         <div class="course-enrolled-card">
@@ -611,7 +679,10 @@
               <span>Rs. 6,000</span>
             </div>
           </div>
-          <a href="https://wa.me/923406222068?text=Hi! I want to continue CS course" target="_blank" class="btn btn-primary btn-sm">Continue</a>
+          <div class="osa-row-actions">
+            <button class="osa-edit-btn" onclick="osaEditCourse(5)">Edit</button>
+            <button class="osa-delete-btn" onclick="osaDeleteCourse(5)">&#128465;</button>
+          </div>
         </div>
 
         <div class="course-enrolled-card">
@@ -626,7 +697,10 @@
               <span>Rs. 5,000</span>
             </div>
           </div>
-          <a href="https://wa.me/923406222068?text=Hi! I want to continue Biology course" target="_blank" class="btn btn-primary btn-sm">Continue</a>
+          <div class="osa-row-actions">
+            <button class="osa-edit-btn" onclick="osaEditCourse(6)">Edit</button>
+            <button class="osa-delete-btn" onclick="osaDeleteCourse(6)">&#128465;</button>
+          </div>
         </div>
       </div>
 
@@ -637,6 +711,7 @@
             <h2 style="margin-bottom:4px;">Weekly <span class="text-accent">Schedule</span></h2>
             <p class="text-light" style="margin:0;">Your upcoming class timetable.</p>
           </div>
+          <button class="osa-add-btn" onclick="osaEditSchedule()">Edit Schedule</button>
         </div>
         <table class="schedule-table">
           <thead>
@@ -698,6 +773,7 @@
             <h2 style="margin-bottom:4px;">My <span class="text-accent">Grades</span></h2>
             <p class="text-light" style="margin:0;">Subject-wise academic performance.</p>
           </div>
+          <button class="osa-add-btn" onclick="osaEditGrade(null)">+ Add Grade</button>
         </div>
         <table class="grades-table">
           <thead>
@@ -707,6 +783,7 @@
               <th>Marks</th>
               <th>Grade</th>
               <th>Status</th>
+              <th>Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -716,6 +793,7 @@
               <td>85/100</td>
               <td><span class="grade-a">A</span></td>
               <td><span class="badge" style="background:#e8f5e9; color:#2e7d32;">Passed</span></td>
+              <td><div class="osa-row-actions"><button class="osa-edit-btn" onclick="osaEditGrade(1)">Edit</button><button class="osa-delete-btn" onclick="osaDeleteGrade(1)">&#128465;</button></div></td>
             </tr>
             <tr>
               <td style="font-weight:600;">Physics</td>
@@ -723,6 +801,7 @@
               <td>70/100</td>
               <td><span class="grade-b">B</span></td>
               <td><span class="badge" style="background:#e8f5e9; color:#2e7d32;">Passed</span></td>
+              <td><div class="osa-row-actions"><button class="osa-edit-btn" onclick="osaEditGrade(2)">Edit</button><button class="osa-delete-btn" onclick="osaDeleteGrade(2)">&#128465;</button></div></td>
             </tr>
             <tr>
               <td style="font-weight:600;">Chemistry</td>
@@ -730,6 +809,7 @@
               <td>91/100</td>
               <td><span class="grade-a">A+</span></td>
               <td><span class="badge" style="background:#e8f5e9; color:#2e7d32;">Passed</span></td>
+              <td><div class="osa-row-actions"><button class="osa-edit-btn" onclick="osaEditGrade(3)">Edit</button><button class="osa-delete-btn" onclick="osaDeleteGrade(3)">&#128465;</button></div></td>
             </tr>
             <tr>
               <td style="font-weight:600;">English</td>
@@ -737,6 +817,7 @@
               <td>58/100</td>
               <td><span class="grade-c">C</span></td>
               <td><span class="badge" style="background:#fff3e0; color:#e65100;">Needs Work</span></td>
+              <td><div class="osa-row-actions"><button class="osa-edit-btn" onclick="osaEditGrade(4)">Edit</button><button class="osa-delete-btn" onclick="osaDeleteGrade(4)">&#128465;</button></div></td>
             </tr>
             <tr>
               <td style="font-weight:600;">Computer Science</td>
@@ -744,6 +825,7 @@
               <td>88/100</td>
               <td><span class="grade-a">A</span></td>
               <td><span class="badge" style="background:#e8f5e9; color:#2e7d32;">Passed</span></td>
+              <td><div class="osa-row-actions"><button class="osa-edit-btn" onclick="osaEditGrade(5)">Edit</button><button class="osa-delete-btn" onclick="osaDeleteGrade(5)">&#128465;</button></div></td>
             </tr>
             <tr>
               <td style="font-weight:600;">Biology</td>
@@ -751,6 +833,7 @@
               <td>74/100</td>
               <td><span class="grade-b">B</span></td>
               <td><span class="badge" style="background:#e8f5e9; color:#2e7d32;">Passed</span></td>
+              <td><div class="osa-row-actions"><button class="osa-edit-btn" onclick="osaEditGrade(6)">Edit</button><button class="osa-delete-btn" onclick="osaDeleteGrade(6)">&#128465;</button></div></td>
             </tr>
           </tbody>
         </table>
@@ -763,6 +846,7 @@
             <h2 style="margin-bottom:4px;">Messages</h2>
             <p class="text-light" style="margin:0;">Communicate with your teachers.</p>
           </div>
+          <button class="osa-add-btn" onclick="osaEditMessage(null)">+ Add Message</button>
         </div>
         <div class="card">
           <div class="card-body">
@@ -775,6 +859,10 @@
                 </div>
                 <div class="msg-preview">Great progress on the algebra assignment! Your quadratic equations are improving. Keep practicing the harder problems.</div>
               </div>
+              <div class="osa-row-actions">
+                <button class="osa-edit-btn" onclick="osaEditMessage(1)">Edit</button>
+                <button class="osa-delete-btn" onclick="osaDeleteMessage(1)">&#128465;</button>
+              </div>
               <div class="msg-unread"></div>
             </div>
             <div class="message-item">
@@ -786,6 +874,10 @@
                 </div>
                 <div class="msg-preview">Don't forget to complete the Newton's Laws worksheet before tomorrow's class. We'll review it together.</div>
               </div>
+              <div class="osa-row-actions">
+                <button class="osa-edit-btn" onclick="osaEditMessage(2)">Edit</button>
+                <button class="osa-delete-btn" onclick="osaDeleteMessage(2)">&#128465;</button>
+              </div>
             </div>
             <div class="message-item">
               <div class="msg-avatar" style="background:#2d5a3d; color:#fff;">FN</div>
@@ -795,6 +887,10 @@
                   <span class="msg-time">2 days ago</span>
                 </div>
                 <div class="msg-preview">Excellent work on the organic chemistry quiz! You scored 9/10. Just review benzene derivatives for next class.</div>
+              </div>
+              <div class="osa-row-actions">
+                <button class="osa-edit-btn" onclick="osaEditMessage(3)">Edit</button>
+                <button class="osa-delete-btn" onclick="osaDeleteMessage(3)">&#128465;</button>
               </div>
             </div>
             <div class="message-item">
@@ -806,6 +902,10 @@
                 </div>
                 <div class="msg-preview">Your essay needs more depth in the analysis section. Let's schedule a meeting to discuss improvements.</div>
               </div>
+              <div class="osa-row-actions">
+                <button class="osa-edit-btn" onclick="osaEditMessage(4)">Edit</button>
+                <button class="osa-delete-btn" onclick="osaDeleteMessage(4)">&#128465;</button>
+              </div>
             </div>
             <div class="message-item">
               <div class="msg-avatar" style="background:#2a2a5a; color:#fff;">MH</div>
@@ -815,6 +915,10 @@
                   <span class="msg-time">5 days ago</span>
                 </div>
                 <div class="msg-preview">Welcome to the CS course! Make sure you have Python installed before our first coding session.</div>
+              </div>
+              <div class="osa-row-actions">
+                <button class="osa-edit-btn" onclick="osaEditMessage(5)">Edit</button>
+                <button class="osa-delete-btn" onclick="osaDeleteMessage(5)">&#128465;</button>
               </div>
             </div>
           </div>
@@ -835,24 +939,24 @@
           <div class="settings-row">
             <div>
               <label class="settings-label">Full Name</label>
-              <input type="text" class="settings-input" value="Admin User">
+              <input type="text" class="settings-input" id="settingsName" value="Admin User">
             </div>
             <div>
               <label class="settings-label">Email Address</label>
-              <input type="email" class="settings-input" value="asmaiqbal847@gmail.com">
+              <input type="email" class="settings-input" id="settingsEmail" value="asmaiqbal847@gmail.com">
             </div>
           </div>
           <div class="settings-row">
             <div>
               <label class="settings-label">Phone Number</label>
-              <input type="tel" class="settings-input" value="+92 340 6222068">
+              <input type="tel" class="settings-input" id="settingsPhone" value="+92 340 6222068">
             </div>
             <div>
               <label class="settings-label">Role</label>
               <input type="text" class="settings-input" value="Administrator" disabled style="opacity:0.6;">
             </div>
           </div>
-          <a href="#" class="btn btn-primary btn-sm" style="margin-top:8px;">Save Changes</a>
+          <button class="btn btn-primary btn-sm" style="margin-top:8px;" onclick="osaSaveSettings()">Save Changes</button>
         </div>
 
         <div class="settings-group">
@@ -860,14 +964,14 @@
           <div class="settings-row">
             <div>
               <label class="settings-label">Current Password</label>
-              <input type="password" class="settings-input" placeholder="Enter current password">
+              <input type="password" class="settings-input" id="settingsCurrentPw" placeholder="Enter current password">
             </div>
             <div>
               <label class="settings-label">New Password</label>
-              <input type="password" class="settings-input" placeholder="Enter new password">
+              <input type="password" class="settings-input" id="settingsNewPw" placeholder="Enter new password">
             </div>
           </div>
-          <a href="#" class="btn btn-primary btn-sm" style="margin-top:8px;">Update Password</a>
+          <button class="btn btn-primary btn-sm" style="margin-top:8px;" onclick="osaChangePassword()">Update Password</button>
         </div>
 
         <div class="settings-group">
@@ -901,6 +1005,13 @@
             <div class="toggle-switch on" onclick="this.classList.toggle('on')"></div>
           </div>
         </div>
+
+        <div class="settings-group" style="margin-top:24px;">
+          <h4>Data Management</h4>
+          <div style="display:flex; gap:12px; flex-wrap:wrap;">
+            <button class="btn btn-primary btn-sm" onclick="osaReset()">Reset All Data</button>
+          </div>
+        </div>
       </div>
 
       <!-- ============ TAB: PROFILE ============ -->
@@ -910,6 +1021,7 @@
             <h2 style="margin-bottom:4px;">My <span class="text-accent">Profile</span></h2>
             <p class="text-light" style="margin:0;">Your account information.</p>
           </div>
+          <button class="osa-edit-btn" onclick="osaEditProfile()">Edit Profile</button>
         </div>
         <div class="profile-card">
           <div class="profile-avatar">A</div>
@@ -939,6 +1051,8 @@
     </main>
   </div>
 
+  <script src="../js/data.js"></script>
+  <script src="../js/admin.js"></script>
   <script src="../js/main.js"></script>
   <script src="../js/dashboard.js"></script>
 </body>
