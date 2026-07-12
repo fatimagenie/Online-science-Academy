@@ -43,6 +43,9 @@ function osaEditBranding() {
     d.branding.phone = modal.querySelector('#osPhone').value;
     d.branding.address = modal.querySelector('#osAddress').value;
     osaSave(d);
+    if (typeof db !== 'undefined') {
+      db.collection('settings').doc('main').set({ branding: d.branding, profile: d.profile }, { merge: true }).catch(function(e) { console.log('Firestore error:', e); });
+    }
     osaRefreshAdmin();
   });
 }
@@ -52,10 +55,10 @@ function osaEditCourse(id) {
   var c = id ? d.courses.find(function(x){return x.id===id;}) : { name:'', category:'math', teacher:'', initials:'', description:'', grade:'Grade 9-10', lessons:0, rating:0, stars:0, price:'Rs. 0', emoji:'\u{1F4DA}', colors:['#003366','#3a5f94'] };
   var isNew = !id;
   var cats = ['math','physics','chemistry','biology','english','cs'];
-  var catOpts = cats.map(function(c){ return '<option value="'+c+'"'+(c===c.category?' selected':'')+'>'+c+'</option>'; }).join('');
+  var catOpts = cats.map(function(cat){ return '<option value="'+cat+'"'+(cat===c.category?' selected':'')+'>'+cat+'</option>'; }).join('');
   var html = '<div class="osa-form-row">' +
     '<div class="osa-form-group"><label>Course Name</label><input class="osa-input" id="ocName" value="' + osaEsc(c.name) + '"></div>' +
-    '<div class="osa-form-group"><label>Category</label><select class="osa-input" id="ocCat">' + cats.map(function(cat){ return '<option value="'+cat+'"'+(cat===c.category?' selected':'')+'>'+cat+'</option>'; }).join('') + '</select></div></div>' +
+    '<div class="osa-form-group"><label>Category</label><select class="osa-input" id="ocCat">' + catOpts + '</select></div></div>' +
     '<div class="osa-form-row">' +
     '<div class="osa-form-group"><label>Teacher Name</label><input class="osa-input" id="ocTeacher" value="' + osaEsc(c.teacher) + '"></div>' +
     '<div class="osa-form-group"><label>Initials (2 letters)</label><input class="osa-input" id="ocInitials" value="' + osaEsc(c.initials) + '" maxlength="2"></div></div>' +
@@ -86,6 +89,9 @@ function osaEditCourse(id) {
     if (isNew) { d.courses.push(updated); }
     else { var idx = d.courses.findIndex(function(x){return x.id===id;}); if(idx>=0) d.courses[idx] = updated; }
     osaSave(d);
+    if (typeof db !== 'undefined') {
+      firebaseAddDoc('courses', updated).catch(function(e) { console.log('Firestore error:', e); });
+    }
     osaRefreshAdmin();
   });
 }
@@ -95,6 +101,9 @@ function osaDeleteCourse(id) {
     var d = osaLoad();
     d.courses = d.courses.filter(function(c){return c.id!==id;});
     osaSave(d);
+    if (typeof db !== 'undefined') {
+      firebaseDeleteDoc('courses', id).catch(function(e) { console.log('Firestore error:', e); });
+    }
     osaRefreshAdmin();
   });
 }
@@ -125,6 +134,9 @@ function osaEditGrade(id) {
     if (isNew) { d.grades.push(updated); }
     else { var idx = d.grades.findIndex(function(x){return x.id===id;}); if(idx>=0) d.grades[idx] = updated; }
     osaSave(d);
+    if (typeof db !== 'undefined') {
+      firebaseAddDoc('grades', updated).catch(function(e) { console.log('Firestore error:', e); });
+    }
     osaRefreshAdmin();
   });
 }
@@ -134,6 +146,9 @@ function osaDeleteGrade(id) {
     var d = osaLoad();
     d.grades = d.grades.filter(function(g){return g.id!==id;});
     osaSave(d);
+    if (typeof db !== 'undefined') {
+      firebaseDeleteDoc('grades', id).catch(function(e) { console.log('Firestore error:', e); });
+    }
     osaRefreshAdmin();
   });
 }
@@ -159,6 +174,9 @@ function osaEditMessage(id) {
     if (isNew) { d.messages.push(updated); }
     else { var idx = d.messages.findIndex(function(x){return x.id===id;}); if(idx>=0) d.messages[idx] = updated; }
     osaSave(d);
+    if (typeof db !== 'undefined') {
+      firebaseAddDoc('messages', updated).catch(function(e) { console.log('Firestore error:', e); });
+    }
     osaRefreshAdmin();
   });
 }
@@ -168,6 +186,9 @@ function osaDeleteMessage(id) {
     var d = osaLoad();
     d.messages = d.messages.filter(function(m){return m.id!==id;});
     osaSave(d);
+    if (typeof db !== 'undefined') {
+      firebaseDeleteDoc('messages', id).catch(function(e) { console.log('Firestore error:', e); });
+    }
     osaRefreshAdmin();
   });
 }
@@ -203,6 +224,9 @@ function osaEditSchedule() {
     });
     while (s.grid.length > tsRaw.length) s.grid.pop();
     osaSave(d);
+    if (typeof db !== 'undefined') {
+      db.collection('schedule').doc('main').set(s).catch(function(e) { console.log('Firestore error:', e); });
+    }
     osaRefreshAdmin();
   });
 }
@@ -218,25 +242,10 @@ function osaEditProfile() {
     d.profile.email = modal.querySelector('#opEmail').value;
     d.profile.phone = modal.querySelector('#opPhone').value;
     osaSave(d);
+    if (typeof db !== 'undefined') {
+      db.collection('settings').doc('main').set({ branding: d.branding, profile: d.profile }, { merge: true }).catch(function(e) { console.log('Firestore error:', e); });
+    }
     osaRefreshAdmin();
-  });
-}
-
-function osaChangePassword() {
-  var d = osaLoad();
-  var html = '<div class="osa-form-group"><label>Current Password</label><input class="osa-input" id="opOldPass" type="password"></div>' +
-    '<div class="osa-form-group"><label>New Password</label><input class="osa-input" id="opNewPass" type="password"></div>' +
-    '<div class="osa-form-group"><label>Confirm New Password</label><input class="osa-input" id="opConfPass" type="password"></div>';
-  osaOpenModal('Change Password', html, function(modal) {
-    var oldP = modal.querySelector('#opOldPass').value;
-    var newP = modal.querySelector('#opNewPass').value;
-    var confP = modal.querySelector('#opConfPass').value;
-    if (oldP !== d.password) { alert('Current password is wrong!'); return; }
-    if (!newP || newP.length < 4) { alert('Password must be at least 4 characters!'); return; }
-    if (newP !== confP) { alert('Passwords do not match!'); return; }
-    d.password = newP;
-    osaSave(d);
-    alert('Password updated successfully!');
   });
 }
 
@@ -256,6 +265,9 @@ function osaSaveSettings() {
   if (sp) d.branding.phone = sp.value;
   if (sa) d.branding.address = sa.value;
   osaSave(d);
+  if (typeof db !== 'undefined') {
+    db.collection('settings').doc('main').set({ branding: d.branding, profile: d.profile }, { merge: true }).catch(function(e) { console.log('Firestore error:', e); });
+  }
   alert('Settings saved!');
 }
 
@@ -334,6 +346,9 @@ function osaEditEnrollment(id) {
     if (isNew) { d.enrollments.push(updated); }
     else { var idx = d.enrollments.findIndex(function(x){return x.id===id;}); if (idx >= 0) d.enrollments[idx] = updated; }
     osaSave(d);
+    if (typeof db !== 'undefined') {
+      firebaseAddDoc('enrollments', updated).catch(function(e) { console.log('Firestore error:', e); });
+    }
     osaRefreshAdmin();
   });
 }
@@ -343,6 +358,9 @@ function osaDeleteEnrollment(id) {
     var d = osaLoad();
     d.enrollments = (d.enrollments || []).filter(function(e){return e.id !== id;});
     osaSave(d);
+    if (typeof db !== 'undefined') {
+      firebaseDeleteDoc('enrollments', id).catch(function(e) { console.log('Firestore error:', e); });
+    }
     osaRefreshAdmin();
   });
 }
@@ -423,6 +441,9 @@ function osaEditFee(id) {
     if (isNew) { d.fees.push(updated); }
     else { var idx = d.fees.findIndex(function(x){return x.id===id;}); if (idx >= 0) d.fees[idx] = updated; }
     osaSave(d);
+    if (typeof db !== 'undefined') {
+      firebaseAddDoc('fees', updated).catch(function(e) { console.log('Firestore error:', e); });
+    }
     osaRefreshAdmin();
   });
 }
@@ -432,6 +453,9 @@ function osaDeleteFee(id) {
     var d = osaLoad();
     d.fees = (d.fees || []).filter(function(f){return f.id !== id;});
     osaSave(d);
+    if (typeof db !== 'undefined') {
+      firebaseDeleteDoc('fees', id).catch(function(e) { console.log('Firestore error:', e); });
+    }
     osaRefreshAdmin();
   });
 }

@@ -532,48 +532,67 @@
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
   <script src="../js/data.js"></script>
+  <script src="../js/firebase-config.js"></script>
   <script src="../js/student.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', function() {
-      // Check existing session
+      if (typeof firebaseLoadAll === 'function') {
+        firebaseLoadAll().then(function(fbData) {
+          var d = osaLoad();
+          if (fbData.enrollments.length > 0) d.enrollments = fbData.enrollments;
+          if (fbData.courses.length > 0) d.courses = fbData.courses;
+          if (fbData.grades.length > 0) d.grades = fbData.grades;
+          if (fbData.schedule) d.schedule = fbData.schedule;
+          osaSave(d);
+          checkStudentAuth();
+        }).catch(function() {
+          checkStudentAuth();
+        });
+      } else {
+        checkStudentAuth();
+      }
+    });
+
+    function checkStudentAuth() {
       var session = getStudentSession();
       if (session && session.loggedIn) {
         document.getElementById('authOverlay').classList.add('hidden');
         initDashboard();
       }
+    }
 
-      // Login handler
-      document.getElementById('authLoginBtn').addEventListener('click', function() {
-        var email = document.getElementById('authEmail').value.trim();
-        var errorEl = document.getElementById('authError');
-        var inputEl = document.getElementById('authEmail');
+    document.getElementById('authLoginBtn').addEventListener('click', function() {
+      var email = document.getElementById('authEmail').value.trim();
+      var errorEl = document.getElementById('authError');
+      var inputEl = document.getElementById('authEmail');
 
-        errorEl.classList.remove('show');
-        inputEl.classList.remove('error');
+      errorEl.classList.remove('show');
+      inputEl.classList.remove('error');
 
-        if (!email || !email.includes('@')) {
-          inputEl.classList.add('error');
-          errorEl.textContent = 'Please enter a valid email address.';
-          errorEl.classList.add('show');
-          return;
-        }
+      if (!email || !email.includes('@')) {
+        inputEl.classList.add('error');
+        errorEl.textContent = 'Please enter a valid email address.';
+        errorEl.classList.add('show');
+        return;
+      }
 
-        var student = studentLogin(email);
-        if (student) {
-          document.getElementById('authOverlay').classList.add('hidden');
-          initDashboard();
-        } else {
-          inputEl.classList.add('error');
-          errorEl.textContent = 'Email not found. Please enroll first.';
-          errorEl.classList.add('show');
-        }
-      });
+      var student = studentLogin(email);
+      if (student) {
+        document.getElementById('authOverlay').classList.add('hidden');
+        initDashboard();
+      } else {
+        inputEl.classList.add('error');
+        errorEl.textContent = 'Email not found. Please enroll first.';
+        errorEl.classList.add('show');
+      }
+    });
 
-      // Enter key login
-      document.getElementById('authEmail').addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') document.getElementById('authLoginBtn').click();
-      });
+    document.getElementById('authEmail').addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') document.getElementById('authLoginBtn').click();
     });
 
     function initDashboard() {
@@ -594,7 +613,6 @@
         purple: '#6b3a6b'
       };
 
-      // Performance chart
       var ctx1 = document.getElementById('studentChart1');
       if (ctx1) {
         new Chart(ctx1, {
@@ -619,7 +637,6 @@
         });
       }
 
-      // Study hours chart
       var ctx2 = document.getElementById('studentChart2');
       if (ctx2) {
         new Chart(ctx2, {

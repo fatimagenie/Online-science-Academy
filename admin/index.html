@@ -486,6 +486,7 @@
       if (pass === 'Admin098') {
         sessionStorage.setItem('dashboardAuth', 'true');
         document.getElementById('authOverlay').style.display = 'none';
+        loadAdminData();
       } else {
         document.getElementById('authError').classList.add('show');
         document.getElementById('authPass').value = '';
@@ -1385,17 +1386,63 @@
     </main>
   </div>
 
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
   <script src="../js/data.js"></script>
+  <script src="../js/firebase-config.js"></script>
   <script src="../js/admin.js"></script>
   <script src="../js/main.js"></script>
   <script src="../js/dashboard.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', function() {
-      var d = osaLoad();
+      firebaseSeedDefaults().then(function() {
+        loadAdminData();
+      }).catch(function(e) {
+        console.log('Seed failed, using localStorage:', e);
+        loadAdminData();
+      });
+
+      if (sessionStorage.getItem('dashboardAuth') === 'true') {
+        loadAdminData();
+      }
+    });
+
+    function loadAdminData() {
+      if (typeof firebaseLoadAll === 'function') {
+        firebaseLoadAll().then(function(fbData) {
+          var d = osaLoad();
+          if (fbData.courses.length > 0) d.courses = fbData.courses;
+          if (fbData.enrollments.length > 0) d.enrollments = fbData.enrollments;
+          if (fbData.fees.length > 0) d.fees = fbData.fees;
+          if (fbData.grades.length > 0) d.grades = fbData.grades;
+          if (fbData.messages.length > 0) d.messages = fbData.messages;
+          if (fbData.schedule) d.schedule = fbData.schedule;
+          if (fbData.branding) d.branding = fbData.branding;
+          if (fbData.profile) d.profile = fbData.profile;
+          osaSave(d);
+          renderAdminDashboard(d);
+          loadSettings(d);
+          trackAnalytics();
+        }).catch(function(e) {
+          console.log('Firestore load failed, using localStorage:', e);
+          var d = osaLoad();
+          renderAdminDashboard(d);
+          loadSettings(d);
+          trackAnalytics();
+        });
+      } else {
+        var d = osaLoad();
+        renderAdminDashboard(d);
+        loadSettings(d);
+        trackAnalytics();
+      }
+    }
+
+    function renderAdminDashboard(d) {
       var enrollments = d.enrollments || [];
       var courses = d.courses || [];
 
-      // Update stat numbers
       var totalCourses = document.getElementById('dashTotalCourses');
       if (totalCourses) totalCourses.textContent = courses.length;
 
@@ -1409,7 +1456,6 @@
       var todayEl = document.getElementById('dashTodayEnrollments');
       if (todayEl) todayEl.textContent = todayCount;
 
-      // Track website visits
       var visits = parseInt(localStorage.getItem('osa_visits') || '0') + 1;
       localStorage.setItem('osa_visits', visits);
       var visitsEl = document.getElementById('dashWebsiteVisits');
@@ -1419,7 +1465,6 @@
       var uniqueEl = document.getElementById('dashUniqueVisitors');
       if (uniqueEl) uniqueEl.textContent = Math.floor(visits * 0.35);
 
-      // Render recent enrollments
       var recentEl = document.getElementById('dashRecentEnrollments');
       if (recentEl && enrollments.length > 0) {
         var sorted = enrollments.slice().sort(function(a, b) {
@@ -1444,8 +1489,9 @@
         });
         recentEl.innerHTML = html;
       }
+    }
 
-      // Load settings into Website Settings tab
+    function loadSettings(d) {
       var b = d.branding || {};
       var sn = document.getElementById('settingsName');
       if (sn) sn.value = b.name || 'Online Science Academy';
@@ -1459,7 +1505,13 @@
       if (sp) sp.value = b.phone || '';
       var sa = document.getElementById('settingsAddress');
       if (sa) sa.value = b.address || '';
-    });
+    }
+
+    function trackAnalytics() {
+      if (typeof firebaseUpdateAnalytics === 'function') {
+        firebaseUpdateAnalytics().catch(function(e) { console.log('Analytics error:', e); });
+      }
+    }
 
     function osaRenderAnalytics() {
       var visits = parseInt(localStorage.getItem('osa_visits') || '0');
@@ -1473,16 +1525,39 @@
       localStorage.setItem('osa_today_visits', todayVisits);
       localStorage.setItem('osa_last_visit_date', todayStr);
 
-      var totalEl = document.getElementById('analyticsTotalVisits');
-      if (totalEl) totalEl.textContent = visits;
-      var todayEl = document.getElementById('analyticsTodayVisits');
-      if (todayEl) todayEl.textContent = todayVisits;
-      var uniqueEl = document.getElementById('analyticsUnique');
-      if (uniqueEl) uniqueEl.textContent = Math.floor(visits * 0.35);
+      if (typeof firebaseGetAnalytics === 'function') {
+        firebaseGetAnalytics().then(function(analytics) {
+          var totalEl = document.getElementById('analyticsTotalVisits');
+          if (totalEl) totalEl.textContent = analytics.totalVisits || visits;
+          var todayEl = document.getElementById('analyticsTodayVisits');
+          if (todayEl) todayEl.textContent = analytics.todayVisitsCount || todayVisits;
+          var uniqueEl = document.getElementById('analyticsUnique');
+          if (uniqueEl) uniqueEl.textContent = Math.floor((analytics.totalVisits || visits) * 0.35);
+
+          var lastVisit = analytics.lastVisit;
+          var lastEl = document.getElementById('analyticsLastVisit');
+          if (lastEl && lastVisit) {
+            var visitTime = lastVisit.toDate ? lastVisit.toDate() : new Date(lastVisit);
+            var diff = Math.floor((Date.now() - visitTime.getTime()) / 60000);
+            if (diff < 1) lastEl.textContent = 'Just now';
+            else if (diff < 60) lastEl.textContent = diff + 'm ago';
+            else if (diff < 1440) lastEl.textContent = Math.floor(diff / 60) + 'h ago';
+            else lastEl.textContent = Math.floor(diff / 1440) + 'd ago';
+          } else if (lastEl) {
+            lastEl.textContent = 'First visit';
+          }
+
+          renderAnalyticsCharts(visits, todayVisits);
+        }).catch(function() {
+          renderAnalyticsFallback(visits, todayVisits);
+        });
+      } else {
+        renderAnalyticsFallback(visits, todayVisits);
+      }
 
       var lastVisit = localStorage.getItem('osa_last_admin_visit');
       var lastEl = document.getElementById('analyticsLastVisit');
-      if (lastEl) {
+      if (lastEl && !lastEl.textContent.includes('ago') && lastEl.textContent !== 'First visit') {
         if (lastVisit) {
           var diff = Math.floor((Date.now() - parseInt(lastVisit)) / 60000);
           if (diff < 1) lastEl.textContent = 'Just now';
@@ -1495,7 +1570,6 @@
       }
       localStorage.setItem('osa_last_admin_visit', Date.now());
 
-      // Page views (simulated from enrollments + visits)
       var d = osaLoad();
       var enrollments = d.enrollments || [];
       var pvCourses = document.getElementById('pvCourses');
@@ -1506,8 +1580,16 @@
       if (pvStudent) pvStudent.textContent = enrollments.length;
       var pvAdmin = document.getElementById('pvAdmin');
       if (pvAdmin) pvAdmin.textContent = Math.floor(visits * 0.15);
+    }
 
-      // Charts
+    function renderAnalyticsCharts(visits, todayVisits) {
+      var totalEl = document.getElementById('analyticsTotalVisits');
+      if (totalEl) totalEl.textContent = visits;
+      var todayEl = document.getElementById('analyticsTodayVisits');
+      if (todayEl) todayEl.textContent = todayVisits;
+      var uniqueEl = document.getElementById('analyticsUnique');
+      if (uniqueEl) uniqueEl.textContent = Math.floor(visits * 0.35);
+
       if (typeof Chart !== 'undefined') {
         var ctx1 = document.getElementById('analyticsChart1');
         if (ctx1 && !ctx1.chartInstance) {
@@ -1561,6 +1643,20 @@
       }
     }
 
+    function renderAnalyticsFallback(visits, todayVisits) {
+      var totalEl = document.getElementById('analyticsTotalVisits');
+      if (totalEl) totalEl.textContent = visits;
+      var todayEl = document.getElementById('analyticsTodayVisits');
+      if (todayEl) todayEl.textContent = todayVisits;
+      var uniqueEl = document.getElementById('analyticsUnique');
+      if (uniqueEl) uniqueEl.textContent = Math.floor(visits * 0.35);
+
+      var lastEl = document.getElementById('analyticsLastVisit');
+      if (lastEl) lastEl.textContent = 'Local only';
+
+      renderAnalyticsCharts(visits, todayVisits);
+    }
+
     function osaSaveSettings() {
       var d = osaLoad();
       var sn = document.getElementById('settingsName');
@@ -1577,6 +1673,9 @@
       if (sp) d.branding.phone = sp.value;
       if (sa) d.branding.address = sa.value;
       osaSave(d);
+      if (typeof db !== 'undefined') {
+        db.collection('settings').doc('main').set({ branding: d.branding, profile: d.profile }, { merge: true }).catch(function(e) { console.log('Firestore error:', e); });
+      }
       alert('Settings saved!');
     }
   </script>

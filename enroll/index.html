@@ -210,18 +210,37 @@
     </div>
   </footer>
 
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
   <script src="../js/data.js"></script>
+  <script src="../js/firebase-config.js"></script>
   <script src="../js/main.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', function() {
-      var d = osaLoad();
       var courseSelect = document.getElementById('enrollCourse');
-      d.courses.forEach(function(c) {
-        var opt = document.createElement('option');
-        opt.value = c.id;
-        opt.textContent = c.name;
-        courseSelect.appendChild(opt);
-      });
+
+      function loadCourses(courses) {
+        courseSelect.innerHTML = '<option value="">-- Select a course --</option>';
+        courses.forEach(function(c) {
+          var opt = document.createElement('option');
+          opt.value = c.id;
+          opt.textContent = c.name;
+          courseSelect.appendChild(opt);
+        });
+      }
+
+      if (typeof firebaseLoadAll === 'function') {
+        firebaseLoadAll().then(function(fbData) {
+          loadCourses(fbData.courses);
+        }).catch(function() {
+          var d = osaLoad();
+          loadCourses(d.courses);
+        });
+      } else {
+        var d = osaLoad();
+        loadCourses(d.courses);
+      }
 
       document.getElementById('enrollForm').addEventListener('submit', function(e) {
         e.preventDefault();
@@ -238,6 +257,7 @@
         if (!phone.value.trim()) { phone.classList.add('error'); document.getElementById('errPhone').classList.add('show'); valid = false; }
         if (!valid) return;
 
+        var d = osaLoad();
         var existing = osaStudentLogin(email.value.trim());
         if (existing) {
           document.getElementById('errEmail').textContent = 'This email is already enrolled. Please login.';

@@ -86,7 +86,7 @@ function osaLoad() {
 function osaSave(data) {
   try {
     localStorage.setItem('osa_data', JSON.stringify(data));
-  } catch(e) { alert('Could not save data.'); }
+  } catch(e) {}
 }
 
 function osaReset() {
@@ -107,6 +107,11 @@ function osaAddEnrollment(data) {
   data.status = 'active';
   d.enrollments.push(data);
   osaSave(d);
+
+  if (typeof firebaseAddDoc === 'function') {
+    firebaseAddDoc('enrollments', data).catch(function(e) { console.log('Firestore write failed:', e); });
+  }
+
   return data;
 }
 
