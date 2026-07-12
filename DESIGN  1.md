@@ -1,5 +1,5 @@
 ---
-name: Academic Vitality
+name: Online Science Academy
 colors:
   surface: '#f9f9ff'
   surface-dim: '#cfdaf2'
