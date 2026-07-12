@@ -12,6 +12,7 @@
     body { font-family: var(--body-font); background: #f5f7fa; min-height: 100vh; }
 
     .enroll-page { max-width: 680px; margin: 0 auto; padding: 40px 24px 60px; }
+    .nav-links a.active { text-decoration: underline; text-underline-offset: 4px; font-weight: 600; }
 
     .enroll-header { text-align: center; margin-bottom: 36px; }
     .enroll-header h1 {
@@ -111,8 +112,10 @@
     <div class="container">
       <a href="../courses/" class="navbar-brand">Online <span>Science Academy</span></a>
       <div class="nav-links">
+        <a href="../courses/">Home</a>
         <a href="../courses/">Courses</a>
-        <a href="../student/" class="btn btn-secondary btn-sm">Student Login</a>
+        <a href="./" class="active">Enroll Now</a>
+        <a href="#footer">Contact</a>
       </div>
       <button class="hamburger" aria-label="Menu">
         <span></span><span></span><span></span>
@@ -176,7 +179,7 @@
 
   </div>
 
-  <footer class="footer">
+  <footer class="footer" id="footer">
     <div class="container">
       <div class="footer-grid">
         <div>

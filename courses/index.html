@@ -12,6 +12,7 @@
     .search-box { max-width: 500px; margin: 0 auto; }
     .filter-bar { padding: 24px 0; }
     .courses-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+    .nav-links a.active { text-decoration: underline; text-underline-offset: 4px; font-weight: 600; }
     .course-card .card-img { height: 180px; }
     .course-card .card-title { font-family: var(--heading-font); font-weight: 700; font-size: 1.1rem; margin-bottom: 8px; }
     .course-card .card-desc { font-size: 0.9rem; color: var(--text-light); margin-bottom: 12px; }
@@ -31,7 +32,10 @@
     <div class="container">
       <a href="../" class="navbar-brand">Online <span>Science Academy</span></a>
       <div class="nav-links">
-        <a href="./">Courses</a>
+        <a href="../courses/">Home</a>
+        <a href="./" class="active">Courses</a>
+        <a href="../enroll/">Enroll Now</a>
+        <a href="#footer">Contact</a>
       </div>
       <button class="hamburger" aria-label="Menu">
         <span></span><span></span><span></span>
@@ -200,7 +204,7 @@
     </div>
   </section>
 
-  <footer class="footer">
+  <footer class="footer" id="footer">
     <div class="container">
       <div class="footer-grid">
         <div>
