@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Courses - Academic Vitality</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/responsive.css">
+  <style>
+    .courses-header { background: var(--primary); padding: 60px 0; color: #fff; }
+    .search-box { max-width: 500px; margin: 0 auto; }
+    .filter-bar { padding: 24px 0; }
+    .courses-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+    .course-card .card-img { height: 180px; }
+    .course-card .card-title { font-family: var(--heading-font); font-weight: 700; font-size: 1.1rem; margin-bottom: 8px; }
+    .course-card .card-desc { font-size: 0.9rem; color: var(--text-light); margin-bottom: 12px; }
+    .course-meta { display: flex; justify-content: space-between; align-items: center; margin-top: 12px; }
+    .course-price { font-size: 1.25rem; font-weight: 700; color: var(--primary); }
+    .course-rating { display: flex; align-items: center; gap: 4px; font-size: 0.9rem; }
+    .teacher-info { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
+    .teacher-avatar { width: 28px; height: 28px; border-radius: 50%; background: var(--primary); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 700; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    @media (max-width: 1024px) { .courses-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 768px) { .courses-grid { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+
+  <nav class="navbar">
+    <div class="container">
+      <a href="index.html" class="navbar-brand">Academic<span>Vitality</span></a>
+      <div class="nav-links">
+        <a href="index.html">Home</a>
+        <a href="courses.html">Courses</a>
+        <a href="dashboard.html">Dashboard</a>
+        <a href="#" class="btn btn-primary btn-sm">Get Started</a>
+      </div>
+      <button class="hamburger" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </nav>
+
+  <section class="courses-header">
+    <div class="container text-center">
+      <h1 style="color:#fff; margin-bottom:12px;">Explore Our <span class="text-accent">Courses</span></h1>
+      <p style="color:rgba(255,255,255,0.8); margin-bottom:32px;">Find the perfect course to boost your academic performance.</p>
+      <div class="search-box">
+        <div class="input-group">
+          <span class="input-icon">&#128269;</span>
+          <input type="text" id="courseSearch" class="input-field" placeholder="Search courses, topics, or teachers..." style="padding-left:48px;">
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="filter-bar">
+    <div class="container">
+      <div style="display:flex; flex-wrap:wrap; gap:12px; justify-content:center;">
+        <span class="chip active" data-filter="all">All Courses</span>
+        <span class="chip" data-filter="math">Mathematics</span>
+        <span class="chip" data-filter="physics">Physics</span>
+        <span class="chip" data-filter="chemistry">Chemistry</span>
+        <span class="chip" data-filter="biology">Biology</span>
+        <span class="chip" data-filter="english">English</span>
+        <span class="chip" data-filter="cs">Computer Science</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" style="padding-top:0;">
+    <div class="container">
+      <div class="courses-grid">
+
+        <div class="card course-card" data-category="math">
+          <div class="card-img" style="background: linear-gradient(135deg, #003366, #3a5f94); display:flex; align-items:center; justify-content:center; font-size:3rem;">&#128290;</div>
+          <div class="card-body">
+            <div class="teacher-info">
+              <div class="teacher-avatar">SR</div>
+              <span style="font-size:0.85rem;" class="text-light">Sir Rashid</span>
+            </div>
+            <div class="card-title">Mathematics: Complete Algebra</div>
+            <div class="card-desc">Master algebra from basics to advanced quadratic equations and functions.</div>
+            <div style="display:flex; gap:8px; margin-bottom:12px;">
+              <span class="badge">Grade 9-10</span>
+              <span class="badge">24 Lessons</span>
+            </div>
+            <div class="course-meta">
+              <div class="course-rating">&#9733;&#9733;&#9733;&#9733;&#9734; <span class="text-light">(4.2)</span></div>
+              <div class="course-price">Rs. 4,500</div>
+            </div>
+            <a href="#" class="btn btn-primary" style="width:100%; margin-top:16px;">Enroll Now</a>
+          </div>
+        </div>
+
+        <div class="card course-card" data-category="physics">
+          <div class="card-img" style="background: linear-gradient(135deg, #1a4a7a, #5a9fd4); display:flex; align-items:center; justify-content:center; font-size:3rem;">&#9883;</div>
+          <div class="card-body">
+            <div class="teacher-info">
+              <div class="teacher-avatar">AK</div>
+              <span style="font-size:0.85rem;" class="text-light">Sir Ahmed Khan</span>
+            </div>
+            <div class="card-title">Physics: Mechanics & Motion</div>
+            <div class="card-desc">Understand Newton's laws, kinematics, and real-world applications.</div>
+            <div style="display:flex; gap:8px; margin-bottom:12px;">
+              <span class="badge">Grade 11-12</span>
+              <span class="badge">30 Lessons</span>
+            </div>
+            <div class="course-meta">
+              <div class="course-rating">&#9733;&#9733;&#9733;&#9733;&#9733; <span class="text-light">(4.8)</span></div>
+              <div class="course-price">Rs. 5,200</div>
+            </div>
+            <a href="#" class="btn btn-primary" style="width:100%; margin-top:16px;">Enroll Now</a>
+          </div>
+        </div>
+
+        <div class="card course-card" data-category="chemistry">
+          <div class="card-img" style="background: linear-gradient(135deg, #2d5a3d, #6ab07a); display:flex; align-items:center; justify-content:center; font-size:3rem;">&#128300;</div>
+          <div class="card-body">
+            <div class="teacher-info">
+              <div class="teacher-avatar">FN</div>
+              <span style="font-size:0.85rem;" class="text-light">Ma'am Fatima Noor</span>
+            </div>
+            <div class="card-title">Chemistry: Organic Basics</div>
+            <div class="card-desc">Learn organic chemistry fundamentals, reactions, and benzene derivatives.</div>
+            <div style="display:flex; gap:8px; margin-bottom:12px;">
+              <span class="badge">Grade 11-12</span>
+              <span class="badge">22 Lessons</span>
+            </div>
+            <div class="course-meta">
+              <div class="course-rating">&#9733;&#9733;&#9733;&#9733;&#9734; <span class="text-light">(4.5)</span></div>
+              <div class="course-price">Rs. 4,800</div>
+            </div>
+            <a href="#" class="btn btn-primary" style="width:100%; margin-top:16px;">Enroll Now</a>
+          </div>
+        </div>
+
+        <div class="card course-card" data-category="english">
+          <div class="card-img" style="background: linear-gradient(135deg, #6b3a6b, #b07ab0); display:flex; align-items:center; justify-content:center; font-size:3rem;">&#128214;</div>
+          <div class="card-body">
+            <div class="teacher-info">
+              <div class="teacher-avatar">ZI</div>
+              <span style="font-size:0.85rem;" class="text-light">Ma'am Zainab Iqbal</span>
+            </div>
+            <div class="card-title">English: Essay & Literature</div>
+            <div class="card-desc">Improve essay writing, comprehension, and literary analysis skills.</div>
+            <div style="display:flex; gap:8px; margin-bottom:12px;">
+              <span class="badge">Grade 9-12</span>
+              <span class="badge">18 Lessons</span>
+            </div>
+            <div class="course-meta">
+              <div class="course-rating">&#9733;&#9733;&#9733;&#9733;&#9734; <span class="text-light">(4.3)</span></div>
+              <div class="course-price">Rs. 3,800</div>
+            </div>
+            <a href="#" class="btn btn-primary" style="width:100%; margin-top:16px;">Enroll Now</a>
+          </div>
+        </div>
+
+        <div class="card course-card" data-category="cs">
+          <div class="card-img" style="background: linear-gradient(135deg, #2a2a5a, #6a6aaa); display:flex; align-items:center; justify-content:center; font-size:3rem;">&#128187;</div>
+          <div class="card-body">
+            <div class="teacher-info">
+              <div class="teacher-avatar">MH</div>
+              <span style="font-size:0.85rem;" class="text-light">Sir Muhammad Haris</span>
+            </div>
+            <div class="card-title">Computer Science: Programming</div>
+            <div class="card-desc">Learn programming fundamentals with C++ and Python from scratch.</div>
+            <div style="display:flex; gap:8px; margin-bottom:12px;">
+              <span class="badge">Grade 9-12</span>
+              <span class="badge">36 Lessons</span>
+            </div>
+            <div class="course-meta">
+              <div class="course-rating">&#9733;&#9733;&#9733;&#9733;&#9733; <span class="text-light">(4.9)</span></div>
+              <div class="course-price">Rs. 6,000</div>
+            </div>
+            <a href="#" class="btn btn-primary" style="width:100%; margin-top:16px;">Enroll Now</a>
+          </div>
+        </div>
+
+        <div class="card course-card" data-category="biology">
+          <div class="card-img" style="background: linear-gradient(135deg, #2d5a2d, #70b070); display:flex; align-items:center; justify-content:center; font-size:3rem;">&#129516;</div>
+          <div class="card-body">
+            <div class="teacher-info">
+              <div class="teacher-avatar">RS</div>
+              <span style="font-size:0.85rem;" class="text-light">Ma'am Rabia Shah</span>
+            </div>
+            <div class="card-title">Biology: Cell & Genetics</div>
+            <div class="card-desc">Explore cell biology, DNA, genetics, and modern biotechnology.</div>
+            <div style="display:flex; gap:8px; margin-bottom:12px;">
+              <span class="badge">Grade 11-12</span>
+              <span class="badge">28 Lessons</span>
+            </div>
+            <div class="course-meta">
+              <div class="course-rating">&#9733;&#9733;&#9733;&#9733;&#9734; <span class="text-light">(4.6)</span></div>
+              <div class="course-price">Rs. 5,000</div>
+            </div>
+            <a href="#" class="btn btn-primary" style="width:100%; margin-top:16px;">Enroll Now</a>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div>
+          <div class="footer-brand">Academic<span>Vitality</span></div>
+          <p style="font-size:0.9rem;">Empowering students to achieve academic excellence through personalized online tuition.</p>
+        </div>
+        <div>
+          <h4>Quick Links</h4>
+          <a href="index.html">Home</a>
+          <a href="courses.html">Courses</a>
+          <a href="dashboard.html">Dashboard</a>
+        </div>
+        <div>
+          <h4>Subjects</h4>
+          <a href="#">Mathematics</a>
+          <a href="#">Physics</a>
+          <a href="#">Chemistry</a>
+        </div>
+        <div>
+          <h4>Contact</h4>
+          <a href="#">info@academicvitality.com</a>
+          <a href="#">+92 300 1234567</a>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2026 Academic Vitality. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/main.js"></script>
+  <script src="js/courses.js"></script>
+</body>
+</html>
