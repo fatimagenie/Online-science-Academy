@@ -57,6 +57,12 @@
 </head>
 <body>
 
+  <script>
+    if (sessionStorage.getItem('dashboardAuth') !== 'true') {
+      window.location.href = 'login.html';
+    }
+  </script>
+
   <nav class="navbar">
     <div class="container">
       <div style="display:flex; align-items:center; gap:16px;">
@@ -69,7 +75,7 @@
         <a href="index.html">Home</a>
         <a href="courses.html">Courses</a>
         <a href="#">Profile</a>
-        <a href="#" class="btn btn-primary btn-sm">Logout</a>
+        <a href="#" class="btn btn-primary btn-sm" onclick="sessionStorage.removeItem('dashboardAuth'); window.location.href='login.html';">Logout</a>
       </div>
       <button class="hamburger" aria-label="Menu">
         <span></span><span></span><span></span>
