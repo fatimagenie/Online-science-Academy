@@ -81,9 +81,6 @@ function renderStudentDashboard() {
   var courseTitle = document.getElementById('dashboardCourseTitle');
   if (courseTitle && course) courseTitle.textContent = course.name;
 
-  var courseTeacher = document.getElementById('dashboardCourseTeacher');
-  if (courseTeacher && course) courseTeacher.textContent = course.teacher;
-
   var courseGrade = document.getElementById('dashboardCourseGrade');
   if (courseGrade && course) courseGrade.textContent = course.grade;
 
@@ -111,7 +108,6 @@ function renderStudentCourses() {
       '<div class="student-course-icon" style="background: linear-gradient(135deg, ' + (course.colors ? course.colors[0] : '#003366') + ', ' + (course.colors ? course.colors[1] : '#3a5f94') + ');">' + (course.emoji || '&#128218;') + '</div>' +
       '<div class="student-course-info">' +
         '<div class="student-course-title">' + osEsc(course.name) + '</div>' +
-        '<div class="student-course-teacher">' + osEsc(course.teacher) + '</div>' +
         '<div class="progress-bar" style="margin:12px 0;"><div class="fill" style="width:' + progress + '%;"></div></div>' +
         '<div class="student-course-meta">' +
           '<span>' + progress + '% Complete</span>' +
@@ -132,7 +128,7 @@ function renderStudentSchedule() {
   var d = osaLoad();
   var s = d.schedule;
   var courseCat = course.category;
-  var subjectMap = { math: 'Math', physics: 'Physics', chemistry: 'Chemistry', biology: 'Biology', english: 'English', cs: 'CS' };
+  var subjectMap = { math: 'Math', physics: 'Physics', science: 'Science', biology: 'Biology', english: 'English', cs: 'CS' };
   var courseSubject = subjectMap[courseCat] || '';
 
   var html = '<thead><tr><th>Time</th>';
@@ -144,9 +140,9 @@ function renderStudentSchedule() {
     s.days.forEach(function(day, di) {
       var cell = s.grid[ti] ? s.grid[ti][di] : { subject: '', teacher: '' };
       if (cell.subject === courseSubject) {
-        html += '<td style="background:rgba(255,215,0,0.1); border:2px solid var(--accent); border-radius:8px;"><span class="schedule-subject" style="font-weight:700;">' + osEsc(cell.subject) + '</span><br><span class="schedule-time">' + osEsc(cell.teacher) + '</span></td>';
+        html += '<td style="background:rgba(255,215,0,0.1); border:2px solid var(--accent); border-radius:8px;"><span class="schedule-subject" style="font-weight:700;">' + osEsc(cell.subject) + '</span></td>';
       } else {
-        html += '<td style="opacity:0.4;"><span class="schedule-subject">' + osEsc(cell.subject) + '</span><br><span class="schedule-time">' + osEsc(cell.teacher) + '</span></td>';
+        html += '<td style="opacity:0.4;"><span class="schedule-subject">' + osEsc(cell.subject) + '</span></td>';
       }
     });
     html += '</tr>';
@@ -163,13 +159,13 @@ function renderStudentGrades() {
 
   var d = osaLoad();
   var courseCat = course.category;
-  var subjectMap = { math: 'Mathematics', physics: 'Physics', chemistry: 'Chemistry', biology: 'Biology', english: 'English', cs: 'Computer Science' };
+  var subjectMap = { math: 'Mathematics', physics: 'Physics', science: 'Science', biology: 'Biology', english: 'English', cs: 'Computer Science' };
   var courseSubject = subjectMap[courseCat] || '';
 
   var matchingGrades = d.grades.filter(function(g) { return g.subject === courseSubject; });
 
   if (matchingGrades.length === 0) {
-    container.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:32px; color:var(--text-light);">No grades available yet.</td></tr>';
+    container.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:32px; color:var(--text-light);">No grades available yet.</td></tr>';
     return;
   }
 
@@ -184,7 +180,6 @@ function renderStudentGrades() {
 
     html += '<tr>' +
       '<td style="font-weight:600;">' + osEsc(g.subject) + '</td>' +
-      '<td>' + osEsc(g.teacher) + '</td>' +
       '<td>' + g.marks + '/' + g.total + '</td>' +
       '<td><span class="' + gradeClass + '">' + osEsc(g.grade) + '</span></td>' +
       '<td><span class="badge" style="' + statusStyle + '">' + osEsc(g.status) + '</span></td>' +

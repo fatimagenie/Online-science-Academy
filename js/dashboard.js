@@ -63,7 +63,7 @@ document.addEventListener('DOMContentLoaded', function() {
       new Chart(marksCtx, {
         type: 'bar',
         data: {
-          labels: ['Math', 'Physics', 'Chemistry', 'English', 'CS', 'Biology'],
+          labels: ['Math', 'Physics', 'Science', 'English', 'CS', 'Biology'],
           datasets: [{
             label: 'Marks',
             data: [85, 70, 91, 58, 88, 74],
@@ -120,7 +120,7 @@ document.addEventListener('DOMContentLoaded', function() {
       new Chart(pieCtx, {
         type: 'doughnut',
         data: {
-          labels: ['Math', 'Physics', 'Chemistry', 'English', 'CS', 'Biology'],
+          labels: ['Math', 'Physics', 'Science', 'English', 'CS', 'Biology'],
           datasets: [{
             data: [25, 20, 18, 12, 15, 10],
             backgroundColor: ['#003366', '#1a4a7a', '#2d5a3d', '#6b3a6b', '#2a2a5a', '#2d5a2d'],

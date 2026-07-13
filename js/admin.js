@@ -54,14 +54,11 @@ function osaEditCourse(id) {
   var d = osaLoad();
   var c = id ? d.courses.find(function(x){return x.id===id;}) : { name:'', category:'math', teacher:'', initials:'', description:'', grade:'Grade 9-10', lessons:0, rating:0, stars:0, price:'Rs. 0', emoji:'\u{1F4DA}', colors:['#003366','#3a5f94'] };
   var isNew = !id;
-  var cats = ['math','physics','chemistry','biology','english','cs'];
+  var cats = ['math','physics','science','biology','english','cs'];
   var catOpts = cats.map(function(cat){ return '<option value="'+cat+'"'+(cat===c.category?' selected':'')+'>'+cat+'</option>'; }).join('');
   var html = '<div class="osa-form-row">' +
     '<div class="osa-form-group"><label>Course Name</label><input class="osa-input" id="ocName" value="' + osaEsc(c.name) + '"></div>' +
     '<div class="osa-form-group"><label>Category</label><select class="osa-input" id="ocCat">' + catOpts + '</select></div></div>' +
-    '<div class="osa-form-row">' +
-    '<div class="osa-form-group"><label>Teacher Name</label><input class="osa-input" id="ocTeacher" value="' + osaEsc(c.teacher) + '"></div>' +
-    '<div class="osa-form-group"><label>Initials (2 letters)</label><input class="osa-input" id="ocInitials" value="' + osaEsc(c.initials) + '" maxlength="2"></div></div>' +
     '<div class="osa-form-group"><label>Description</label><input class="osa-input" id="ocDesc" value="' + osaEsc(c.description) + '"></div>' +
     '<div class="osa-form-row">' +
     '<div class="osa-form-group"><label>Grade</label><input class="osa-input" id="ocGrade" value="' + osaEsc(c.grade) + '"></div>' +
@@ -75,8 +72,8 @@ function osaEditCourse(id) {
       id: c.id || osaNextId(d.courses),
       name: modal.querySelector('#ocName').value,
       category: modal.querySelector('#ocCat').value,
-      teacher: modal.querySelector('#ocTeacher').value,
-      initials: modal.querySelector('#ocInitials').value.toUpperCase(),
+      teacher: '',
+      initials: '',
       description: modal.querySelector('#ocDesc').value,
       grade: modal.querySelector('#ocGrade').value,
       lessons: parseInt(modal.querySelector('#ocLessons').value) || 0,
@@ -113,8 +110,7 @@ function osaEditGrade(id) {
   var g = id ? d.grades.find(function(x){return x.id===id;}) : { subject:'', teacher:'', marks:0, total:100, grade:'A', status:'Passed' };
   var isNew = !id;
   var html = '<div class="osa-form-row">' +
-    '<div class="osa-form-group"><label>Subject</label><input class="osa-input" id="ogSubject" value="' + osaEsc(g.subject) + '"></div>' +
-    '<div class="osa-form-group"><label>Teacher</label><input class="osa-input" id="ogTeacher" value="' + osaEsc(g.teacher) + '"></div></div>' +
+    '<div class="osa-form-group"><label>Subject</label><input class="osa-input" id="ogSubject" value="' + osaEsc(g.subject) + '"></div></div>' +
     '<div class="osa-form-row">' +
     '<div class="osa-form-group"><label>Marks</label><input class="osa-input" id="ogMarks" type="number" value="' + g.marks + '"></div>' +
     '<div class="osa-form-group"><label>Total</label><input class="osa-input" id="ogTotal" type="number" value="' + g.total + '"></div></div>' +
@@ -125,7 +121,7 @@ function osaEditGrade(id) {
     var updated = {
       id: g.id || osaNextId(d.grades),
       subject: modal.querySelector('#ogSubject').value,
-      teacher: modal.querySelector('#ogTeacher').value,
+      teacher: '',
       marks: parseInt(modal.querySelector('#ogMarks').value) || 0,
       total: parseInt(modal.querySelector('#ogTotal').value) || 100,
       grade: modal.querySelector('#ogGrade').value,
@@ -157,15 +153,12 @@ function osaEditMessage(id) {
   var d = osaLoad();
   var m = id ? d.messages.find(function(x){return x.id===id;}) : { sender:'', initials:'', color:'#003366', text:'', time:'Just now', unread:true };
   var isNew = !id;
-  var html = '<div class="osa-form-row">' +
-    '<div class="osa-form-group"><label>Sender Name</label><input class="osa-input" id="omSender" value="' + osaEsc(m.sender) + '"></div>' +
-    '<div class="osa-form-group"><label>Initials</label><input class="osa-input" id="omInitials" value="' + osaEsc(m.initials) + '" maxlength="2"></div></div>' +
-    '<div class="osa-form-group"><label>Message</label><textarea class="osa-input osa-textarea" id="omText">' + osaEsc(m.text) + '</textarea></div>';
+  var html = '<div class="osa-form-group"><label>Message</label><textarea class="osa-input osa-textarea" id="omText">' + osaEsc(m.text) + '</textarea></div>';
   osaOpenModal(isNew ? 'Add Message' : 'Edit Message', html, function(modal) {
     var updated = {
       id: m.id || osaNextId(d.messages),
-      sender: modal.querySelector('#omSender').value,
-      initials: modal.querySelector('#omInitials').value.toUpperCase(),
+      sender: '',
+      initials: '',
       color: m.color || '#003366',
       text: modal.querySelector('#omText').value,
       time: isNew ? 'Just now' : m.time,
@@ -198,14 +191,13 @@ function osaEditSchedule() {
   var s = d.schedule;
   var html = '<p style="margin-bottom:12px;color:var(--text-light);font-size:0.9rem;">Edit time slots (comma separated):</p>' +
     '<div class="osa-form-group"><label>Time Slots</label><input class="osa-input" id="osTimeSlots" value="' + osaEsc(s.timeSlots.join(', ')) + '"></div>' +
-    '<p style="margin:16px 0 8px;color:var(--text-light);font-size:0.9rem;">For each cell, use format: Subject - Teacher</p>';
+    '<p style="margin:16px 0 8px;color:var(--text-light);font-size:0.9rem;">For each cell, enter the Subject:</p>';
   s.days.forEach(function(day, di) {
     html += '<div style="margin-bottom:12px;"><strong>' + day + '</strong></div>';
     s.timeSlots.forEach(function(slot, ti) {
       var cell = s.grid[ti] ? s.grid[ti][di] : { subject:'', teacher:'' };
       html += '<div class="osa-form-row" style="margin-bottom:4px;">' +
         '<div class="osa-form-group" style="flex:1;"><input class="osa-input osa-input-sm" data-day="' + di + '" data-slot="' + ti + '-sub" value="' + osaEsc(cell.subject) + '" placeholder="Subject"></div>' +
-        '<div class="osa-form-group" style="flex:1;"><input class="osa-input osa-input-sm" data-day="' + di + '" data-slot="' + ti + '-teach" value="' + osaEsc(cell.teacher) + '" placeholder="Teacher"></div>' +
         '</div>';
     });
   });
@@ -217,9 +209,8 @@ function osaEditSchedule() {
         if (!s.grid[ti]) s.grid[ti] = [];
         if (!s.grid[ti][di]) s.grid[ti][di] = { subject:'', teacher:'' };
         var subEl = modal.querySelector('[data-day="'+di+'"][data-slot="'+ti+'-sub"]');
-        var teaEl = modal.querySelector('[data-day="'+di+'"][data-slot="'+ti+'-teach"]');
         if (subEl) s.grid[ti][di].subject = subEl.value;
-        if (teaEl) s.grid[ti][di].teacher = teaEl.value;
+        s.grid[ti][di].teacher = '';
       });
     });
     while (s.grid.length > tsRaw.length) s.grid.pop();

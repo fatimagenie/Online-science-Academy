@@ -438,7 +438,6 @@
               <div style="width:48px; height:48px; border-radius:12px; background:linear-gradient(135deg, #003366, #3a5f94); display:flex; align-items:center; justify-content:center; font-size:1.4rem;">&#128290;</div>
               <div style="flex:1;">
                 <div style="font-weight:600;" id="dashboardCourseTitle">Mathematics: Complete Algebra</div>
-                <div style="font-size:0.85rem; color:var(--text-light);" id="dashboardCourseTeacher">Sir Rashid</div>
               </div>
               <div style="text-align:right;">
                 <div style="font-size:0.8rem; color:var(--text-light);" id="dashboardCourseGrade">Grade 9-10</div>
@@ -485,7 +484,6 @@
           <thead>
             <tr>
               <th>Subject</th>
-              <th>Teacher</th>
               <th>Marks</th>
               <th>Grade</th>
               <th>Status</th>
@@ -618,7 +616,7 @@
         new Chart(ctx1, {
           type: 'bar',
           data: {
-            labels: ['Math', 'Physics', 'Chemistry', 'English', 'CS', 'Biology'],
+            labels: ['Math', 'Physics', 'Science', 'English', 'CS', 'Biology'],
             datasets: [{
               label: 'Marks',
               data: [85, 70, 91, 58, 88, 74],
