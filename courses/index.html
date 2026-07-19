@@ -10,56 +10,46 @@
   <style>
     .courses-hero {
       position: relative; overflow: hidden;
-      background: linear-gradient(135deg, #001a33, #003366, #005599, #003366, #001a33);
+      background: linear-gradient(135deg, #001a33, #002b55, #003f7a, #002b55, #001a33);
       background-size: 300% 300%;
-      animation: heroShimmer 12s ease-in-out infinite;
-      padding: 80px 0 90px; color: #fff;
+      animation: heroShimmer 14s ease-in-out infinite;
+      padding: 90px 0 100px; color: #fff;
     }
     @keyframes heroShimmer {
       0%, 100% { background-position: 0% 50%; }
       50% { background-position: 100% 50%; }
     }
     .courses-hero::before {
-      content: ''; position: absolute; top: -60px; right: -60px;
-      width: 250px; height: 250px; border-radius: 50%;
-      background: radial-gradient(circle, rgba(255,215,0,0.12) 0%, transparent 70%);
+      content: ''; position: absolute; top: -80px; right: -80px;
+      width: 350px; height: 350px; border-radius: 50%;
+      background: radial-gradient(circle, rgba(255,215,0,0.08) 0%, transparent 70%);
     }
     .courses-hero::after {
-      content: ''; position: absolute; bottom: -80px; left: -40px;
-      width: 300px; height: 300px; border-radius: 50%;
-      background: radial-gradient(circle, rgba(255,255,255,0.05) 0%, transparent 70%);
+      content: ''; position: absolute; bottom: -100px; left: -60px;
+      width: 400px; height: 400px; border-radius: 50%;
+      background: radial-gradient(circle, rgba(255,255,255,0.04) 0%, transparent 70%);
     }
     .hero-floating {
-      position: absolute; border-radius: 50%; background: rgba(255,215,0,0.06);
-      animation: floatUp 8s ease-in-out infinite;
+      position: absolute; border-radius: 50%; border: 1px solid rgba(255,215,0,0.08);
+      animation: floatUp 10s ease-in-out infinite;
     }
-    .hero-floating:nth-child(1) { width: 80px; height: 80px; top: 20%; left: 10%; animation-delay: 0s; }
-    .hero-floating:nth-child(2) { width: 50px; height: 50px; top: 60%; left: 80%; animation-delay: 2s; }
-    .hero-floating:nth-child(3) { width: 35px; height: 35px; top: 30%; right: 15%; animation-delay: 4s; }
-    .hero-floating:nth-child(4) { width: 60px; height: 60px; bottom: 15%; left: 25%; animation-delay: 1s; }
+    .hero-floating:nth-child(1) { width: 100px; height: 100px; top: 15%; left: 8%; animation-delay: 0s; background: rgba(255,215,0,0.04); }
+    .hero-floating:nth-child(2) { width: 60px; height: 60px; top: 55%; left: 85%; animation-delay: 3s; background: rgba(255,255,255,0.03); }
+    .hero-floating:nth-child(3) { width: 40px; height: 40px; top: 25%; right: 12%; animation-delay: 5s; background: rgba(255,215,0,0.05); }
+    .hero-floating:nth-child(4) { width: 70px; height: 70px; bottom: 10%; left: 20%; animation-delay: 2s; background: rgba(255,255,255,0.03); }
     @keyframes floatUp {
-      0%, 100% { transform: translateY(0) scale(1); opacity: 0.6; }
-      50% { transform: translateY(-20px) scale(1.1); opacity: 1; }
+      0%, 100% { transform: translateY(0) scale(1); opacity: 0.5; }
+      50% { transform: translateY(-25px) scale(1.08); opacity: 0.9; }
     }
     .courses-hero h1 {
-      font-size: 2.8rem; font-weight: 800; color: #fff; margin-bottom: 16px;
-      position: relative; z-index: 1;
+      font-size: 3rem; font-weight: 800; color: #fff; margin-bottom: 16px;
+      position: relative; z-index: 1; letter-spacing: -0.02em;
     }
     .courses-hero p {
-      font-size: 1.15rem; color: rgba(255,255,255,0.75); margin-bottom: 32px;
+      font-size: 1.15rem; color: rgba(255,255,255,0.7); margin-bottom: 0;
       max-width: 520px; margin-left: auto; margin-right: auto; position: relative; z-index: 1;
+      line-height: 1.7;
     }
-    .hero-btn {
-      display: inline-block; padding: 16px 40px;
-      font-family: var(--heading-font); font-weight: 700; font-size: 1rem;
-      background: linear-gradient(135deg, var(--accent), #FFC000);
-      color: var(--primary-dark); border: none; border-radius: 12px;
-      cursor: pointer; text-decoration: none;
-      box-shadow: 0 6px 24px rgba(255,215,0,0.35);
-      transition: transform 0.2s, box-shadow 0.2s;
-      position: relative; z-index: 1;
-    }
-    .hero-btn:hover { transform: translateY(-3px); box-shadow: 0 10px 32px rgba(255,215,0,0.45); }
     .filter-bar { padding: 24px 0; }
     .courses-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
     .nav-links a.active { text-decoration: underline; text-underline-offset: 4px; font-weight: 600; }
@@ -105,7 +95,6 @@
     <div class="container text-center">
       <h1>Welcome to <span class="text-accent">Online Science Academy</span></h1>
       <p>Discover expert-led courses designed to help you excel in academics and beyond.</p>
-      <a href="../enroll/" class="hero-btn">Enroll Now</a>
     </div>
   </section>
 
